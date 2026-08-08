@@ -71,12 +71,16 @@ app.get('/api/health-check', (req, res) => {
     minute: '2-digit',
     second: '2-digit'
   })
+
+  const test = process.env.TEST || 'TEST variable not found.'
+
   res.status(200).json({
     code: 'OK',
     data: {
       time,
       nodeVersion: process.version,
-      nodeEnv: process.env.NODE_ENV
+      nodeEnv: process.env.NODE_ENV,
+      test: test
     },
     message: 'success',
     success: true
