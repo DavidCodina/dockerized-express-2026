@@ -36,7 +36,7 @@ docker push ghcr.io/YOUR_LOWERCASE_GITHUB_NAME/express-image:v1
 docker pull ghcr.io/davidcodina/express-image:v1
 ```
 
-Make sure to also add the optional credential info, since the GHCR image is private by default. Finally, click the **Connect** button and step through the rest of the basic instructions to deploy."
+Make sure to also add the optional credential info, since the GHCR image is private by default. Finally, click the **Connect** button and step through the rest of the basic instructions to deploy.
 
 ## Next Steps
 
