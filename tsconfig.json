@@ -1,0 +1,50 @@
+{
+  "compilerOptions": {
+    //# Do we need to add back other types like node?
+    //# Try doing: import fs from 'fs' and see what happens.
+    //??? "types": ["vitest/globals"],
+    "target": "ESNext",
+    // "lib": ["ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "strict": true,
+    "allowJs": true,
+    // Report errors in .js files.
+    "checkJs": false,
+    "removeComments": true,
+    "allowSyntheticDefaultImports": true,
+    // "rootDir": "./src",
+    // "outDir": "./dist",
+    "sourceMap": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+
+    // Probably better just to omit this all together.
+    // By default all visible ”@types” packages are included in your compilation.
+    // Packages in node_modules/@types of any enclosing folder are considered visible.
+    // For example, that means packages within ./node_modules/@types/, ../node_modules/@types/, ../../node_modules/@types/, and so on.
+    // "types": ["node", "jest", "express"],
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    ".vscode/**/*",
+    "dist/**/*"
+    // "node_modules/**/*"
+
+    // Gotcha: If you exclude your tests like this, you may run into an issue
+    // where Typescript will suggest installing @types/jest. That's not the problem.
+    // The problem is that you shouldn't be excluding your tests here.
+
+    // "**/*.test.*",
+    // "**/*.spec.*",
+    // "__tests__"
+  ]
+}

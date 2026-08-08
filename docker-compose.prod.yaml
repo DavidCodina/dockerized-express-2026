@@ -1,0 +1,28 @@
+#--------------------------------------------------------------------------
+#
+# Differences from dev, and why:
+#
+#   - No volumes, no develop.watch — production runs the immutable image as built;
+#     nothing gets synced from your filesystem.
+#
+#   - No command override — uses the Dockerfile's CMD ["node", "dist/index.js"] from the production stage.
+#
+#   - restart: unless-stopped — dev doesn't need this (you're watching it); prod should self-heal
+#     after a crash or host reboot.
+#
+#   - .env.production — keeps prod secrets/config out of your dev .env file.
+#
+#--------------------------------------------------------------------------
+services:
+  api:
+    build:
+      context: .
+      target: production
+    container_name: NODE_CONTAINER
+    command: ['node', 'dist/index.js']
+    restart: unless-stopped
+    ports:
+      - '${PORT}:${PORT}'
+      # - '5000:5000'
+    env_file:
+      - .env.production

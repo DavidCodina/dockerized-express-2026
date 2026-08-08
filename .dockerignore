@@ -1,0 +1,15 @@
+node_modules
+docker-compose*
+dist
+.git
+.gitignore
+*.md
+.env
+.env.*
+.DS_Store
+Thumbs.db
+
+coverage
+.vscode
+.idea
+npm-debug.log
