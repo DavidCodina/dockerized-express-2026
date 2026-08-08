@@ -15,7 +15,7 @@ That said, I'm currently not using `docker:prod:up` or the `docker-compose.prod.
 **Log into GHCR:** Make sure you've created a GitHub personal access token first.
 
 ```
-docker login ghcr.io --username YOUR_GITHUB_NAME --password ghp_abc123
+docker login ghcr.io --username YOUR_GITHUB_NAME --password YOUR_GITHUB_TOKEN
 ```
 
 **Build Docker Image Locally:** Here, it's important for Render to specify `--platform linux/amd64`.
@@ -36,7 +36,7 @@ docker push ghcr.io/YOUR_LOWERCASE_GITHUB_NAME/express-image:v1
 docker pull ghcr.io/davidcodina/express-image:v1
 ```
 
-Make sure to also add the optional credential info, since the GHCR image is private by default. Finally, click the **Connect** button and step through the rest of the basic instructions to deploy.
+Make sure to also add the optional credential info, since the GHCR image is private by default. Finally, click the **Connect** button and step through the rest of the basic instructions to deploy."
 
 ## Next Steps
 
