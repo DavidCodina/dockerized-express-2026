@@ -9,7 +9,8 @@
   "scripts": {
     "docker:up": "docker compose -f docker-compose.dev.yaml up --watch",
     "docker:down": "docker compose -f docker-compose.dev.yaml down --rmi local -v",
-    "docker:prod:up": "docker compose --env-file .env.production -f docker-compose.prod.yaml up -d --build",
+    "NOTE": "The docker:prod:up script is not intended for production deployment. It's for local build testing.",
+    "docker:prod:up": "docker compose --env-file .env.production -f docker-compose.prod.yaml up --build",
     "docker:prod:down": "docker compose --env-file .env.production -f docker-compose.prod.yaml down",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",

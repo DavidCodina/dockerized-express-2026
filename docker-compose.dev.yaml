@@ -68,12 +68,19 @@ services:
       - '5432:5432'
     volumes:
       # This is a named volume.
+      # The official Postgres image's actual data directory is /var/lib/postgresql/data
+      # However, I was running into issues with that.
       # ❌ - pgdata:/var/lib/postgresql/data
+      #
+      # Postgres 17→18 changed how the official image lays out data on disk, and the image's own
+      # error message says it directly: the suggested container configuration for 18+ is to place
+      # a single mount at /var/lib/postgresql, which will then place PostgreSQL data in a subdirectory,
+      # rather than mounting /var/lib/postgresql/data directly like older versions.
       - pgdata:/var/lib/postgresql
       #  /docker-entrypoint-initdb.d is a special convention, but it's not a Docker feature itself.
       # It's baked into the official postgres image's startup script, not Docker as a platform.
       # In other words, it has more to do with the official postgres Docker image implementation details.
-      - ./init:/docker-entrypoint-initdb.d
+      # - ./init:/docker-entrypoint-initdb.d
     # Todo: Make sure this is the most idiomatic health check for Postgres.
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U docker_user -d docker_db']

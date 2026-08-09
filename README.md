@@ -1,6 +1,7 @@
 # About This Project
 
 This is a very simple Dockerized Express application.
+
 It contains a `Dockerfile`, `docker-compose.dev.yaml`, and `docker-compose.prod.yaml`. Moreover, the `Dockerfile` is a multi-stage build that is triggered in one of two ways, depending on which `package.json` script is used:
 
 ```
@@ -8,7 +9,7 @@ It contains a `Dockerfile`, `docker-compose.dev.yaml`, and `docker-compose.prod.
 "docker:prod:up": "docker compose --env-file .env.production -f docker-compose.prod.yaml up -d --build",
 ```
 
-That said, I'm currently not using `docker:prod:up` or the `docker-compose.prod.yaml` for the production deployment. Instead, I'm using GitHub Container Registry in conjunction with [render.com](https://render.com/) to deploy the image.
+The `docker:prod:up`, `docker-compose.prod.yaml` and `.env.production` are not intended for production deployment. They're actually only for testing the production build locally. The actual deployment is done using GitHub Container Registry in conjunction with [render.com](https://render.com/) to deploy the image.
 
 ## GitHub Container Registry + Render
 
@@ -37,7 +38,3 @@ docker pull ghcr.io/davidcodina/express-image:v1
 ```
 
 Make sure to also add the optional credential info, since the GHCR image is private by default. Finally, click the **Connect** button and step through the rest of the basic instructions to deploy.
-
-## Next Steps
-
-Again, this is a very basic implementation strictly for testing deployment of production Docker images. The next step is to integrate an SQL database and Prisma.
