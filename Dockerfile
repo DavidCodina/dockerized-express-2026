@@ -17,6 +17,29 @@ RUN npm ci
 
 # 2.  ---- build: compile TypeScript -> dist ----
 FROM deps AS build
+#--------------------------------------------------------------------------
+#
+# npm runs prebuild script automatically before build. 
+#
+#  "prebuild": "npx prisma generate --config ./prisma.config.ts",
+#
+# The actual prisma.config.ts references DATABASE_URL, which so far this part of the Dockerfile has
+# no knowledge of, which ends up causing an error:
+#
+#   PrismaConfigEnvError: Cannot resolve environment variable: DATABASE_URL.
+# 
+# npx prisma generate only needs the schema to generate the client — it doesn't need a real database connection,
+# but if your config file references an env var that isn't resolvable, Prisma throws before it even gets to generation, 
+# because the config loader validates all referenced env vars up front.
+#
+# Solution: Create a dummy DATABASE_URL.
+# This should not affect the production deployment because
+# 1. Multi-stage builds don't carry ENV/ARG across stages.
+# 2. Even if it somehow did carry over, Render's runtime env var would win anyway.
+#
+#--------------------------------------------------------------------------
+ARG DATABASE_URL=postgresql://dummy_user:dummy_password@db:5432/dummy_db
+ENV DATABASE_URL=$DATABASE_URL
 COPY . .
 # The `npm run build` will run your "prebuild" script (npx prisma generate) if you kept it in package.json
 RUN npm run build
