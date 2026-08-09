@@ -1,12 +1,12 @@
 # About This Project
 
-This is a very simple Dockerized Express application.
+This is a very simple dockerized Express application.
 
 It contains a `Dockerfile`, `docker-compose.dev.yaml`, and `docker-compose.prod.yaml`. Moreover, the `Dockerfile` is a multi-stage build that is triggered in one of two ways, depending on which `package.json` script is used:
 
 ```
 "docker:up": "docker compose -f docker-compose.dev.yaml up --watch",
-"docker:prod:up": "docker compose --env-file .env.production -f docker-compose.prod.yaml up -d --build",
+"docker:prod:up": "docker compose --env-file .env.production -f docker-compose.prod.yaml up --build",
 ```
 
 The `docker:prod:up`, `docker-compose.prod.yaml` and `.env.production` are not intended for production deployment. They're actually only for testing the production build locally. The actual deployment is done using GitHub Container Registry in conjunction with [render.com](https://render.com/) to deploy the image.
