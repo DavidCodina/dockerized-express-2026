@@ -4,6 +4,10 @@ import { PrismaClient } from '@/generated/prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import 'dotenv/config'
 
+// 👍🏻 You don't need a different adapter if you're switching to a Render for the production database.
+// PrismaPg (from @prisma/adapter-pg, which wraps node-postgres) works with any standard Postgres server
+// — it just connects via a connection string over the Postgres wire protocol. Render's Postgres is a regular
+// managed Postgres instance, not a special dialect or serverless/edge variant like Neon.
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!
 })

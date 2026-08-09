@@ -109,3 +109,7 @@ USER nodejs
 EXPOSE 5000 
 ENTRYPOINT ["/app/docker-prod-entrypoint.sh"]
 CMD ["node", "dist/index.js"]
+
+
+
+
