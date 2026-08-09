@@ -18,12 +18,14 @@ RUN npm ci
 # 2.  ---- build: compile TypeScript -> dist ----
 FROM deps AS build
 COPY . .
+# The `npm run build` will run your "prebuild" script (npx prisma generate) if you kept it in package.json
 RUN npm run build
 
 # 3.  ---- prod-deps: install only production deps ----
 FROM node:26-alpine3.23 AS prod-deps
 WORKDIR /app
 COPY package.json package-lock.json ./
+# Make sure prisma is NOT a dev dependency!
 RUN npm ci --omit=dev
 
 
@@ -48,9 +50,17 @@ CMD ["npm", "run", "dev"]
 FROM node:26-alpine3.23 AS production
 WORKDIR /app
 ENV NODE_ENV=production
+
+# Copy runtime dependencies (no dev deps)
 COPY --from=prod-deps /app/node_modules ./node_modules
+
+# Copy built application code
 COPY --from=build /app/dist ./dist
 COPY package.json ./
+
+# Copy Prisma schema + migrations so the entrypoint can run `prisma migrate deploy`
+COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/prisma.config.ts ./prisma.config.ts
 
 #--------------------------------------------------------------------------
 #
@@ -80,6 +90,13 @@ COPY package.json ./
 
 RUN addgroup -S nodejs && adduser -S nodejs -G nodejs
 
+# Copy production entrypoint and make executable
+COPY docker-prod-entrypoint.sh /app/docker-prod-entrypoint.sh
+RUN chmod +x /app/docker-prod-entrypoint.sh
+
+# Ensure nodejs user can read app files and node_modules
+RUN chown -R nodejs:nodejs /app
+
 #--------------------------------------------------------------------------
 #
 # This tells Docker: from this line onward, every subsequent instruction — and critically, the final CMD 
@@ -89,6 +106,6 @@ RUN addgroup -S nodejs && adduser -S nodejs -G nodejs
 #
 #--------------------------------------------------------------------------
 USER nodejs
-# ???
 EXPOSE 5000 
+ENTRYPOINT ["/app/docker-prod-entrypoint.sh"]
 CMD ["node", "dist/index.js"]

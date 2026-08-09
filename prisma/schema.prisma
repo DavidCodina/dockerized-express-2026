@@ -1,0 +1,20 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// https://www.prisma.io/docs/orm/core-concepts/supported-databases/postgresql
+datasource db {
+  provider = "postgresql"
+}
+
+model Post {
+  // https://www.prisma.io/docs/orm/prisma-schema/data-model/models#defining-an-id-field
+  id        Int       @id @default(autoincrement())
+  title     String    @unique
+  body      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@map("posts")
+}

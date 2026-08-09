@@ -1,5 +1,22 @@
+# Todo: Have Claude review this.
+
+# Todo: Have Claude fix docker-entrypoint.sh
+
+# Todo: Have Claude review all of the watch section.
+
+# Todo: Ask AI why this isn't conflicting with my homebrew Postgres on my machine.
+
+# Todo: Tell Claude about how I want to push to render.com, but also use a PostgreSQL database from render.com for production.
+## You'll also have to make sure that you have separate logic for a Prisma client in production that uses the specific implementation
+## needed by render.com.
+## Note: we may not actually need a multi-stage build if production is just going to use GitHub Container Registry.
+## Actually, I think we still need a multi-stage build...
+
 services:
   api:
+    depends_on:
+      db:
+        condition: service_healthy
     build:
       context: .
       # target: development tells Docker "stop building once you've completed the stage named development".
@@ -7,6 +24,10 @@ services:
       # It's a plain string lookup, nothing more clever than that.
       target: development
     container_name: NODE_CONTAINER
+    # This will run whenever you do `docker compose up --watch`. In other words, whenever you initialize a new container.
+    # However, the logic for running migrations (i.e., `npx prisma migrate deploy`) will NOT run every time the application
+    # code changes then is saved then sync+restart.
+    entrypoint: ['/app/docker-entrypoint.sh']
     command: ['npm', 'run', 'dev']
     ports:
       - '${PORT}:${PORT}'
@@ -15,16 +36,59 @@ services:
       - .env
     volumes:
       - node_modules:/app/node_modules
+      - ./prisma:/app/prisma
     develop:
       watch:
         - action: sync+restart
           path: ./src
           target: /app/src
         - action: rebuild
+          path: ./docker-entrypoint.sh
+        - action: rebuild
           path: ./package.json
         - action: rebuild
           path: ./package-lock.json
         - action: rebuild
+          path: ./prisma/schema.prisma
+        - action: rebuild
+          path: ./prisma.config.ts
+        - action: rebuild
           path: ./tsconfig.json
+  db:
+    # Using postgres is much more convenient than MySQL because cloud providers
+    # like render.com and neon.com only support Postgres.
+    image: postgres:latest
+    container_name: POSTGRES_CONTAINER
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: docker_user
+      POSTGRES_PASSWORD: docker_password
+      POSTGRES_DB: docker_db
+    ports:
+      - '5432:5432'
+    volumes:
+      # This is a named volume.
+      # ❌ - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
+      #  /docker-entrypoint-initdb.d is a special convention, but it's not a Docker feature itself.
+      # It's baked into the official postgres image's startup script, not Docker as a platform.
+      # In other words, it has more to do with the official postgres Docker image implementation details.
+      - ./init:/docker-entrypoint-initdb.d
+    # Todo: Make sure this is the most idiomatic health check for Postgres.
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U docker_user -d docker_db']
+      interval: 5s
+      timeout: 5s
+      retries: 10
 volumes:
   node_modules:
+  pgdata:
+
+#--------------------------------------------------------------------------
+#
+# Hack into the database when the container is running:
+#
+#   docker exec -it POSTGRES_CONTAINER psql -U docker_user -d docker_db
+#   SELECT id, title, body FROM posts;
+#
+#--------------------------------------------------------------------------
