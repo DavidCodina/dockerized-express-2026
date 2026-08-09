@@ -126,7 +126,7 @@ app.get('/api/posts', async (req: Request, res: Response) => {
       message: 'success',
       success: true
     })
-  } catch (err) {
+  } catch (_err) {
     // if (err instanceof Error) { console.log({ name: err.name, message: err.message }) }
     return res.status(500).json({
       data: null,
