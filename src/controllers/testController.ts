@@ -31,6 +31,7 @@ export const healthCheck = async (req: Request, res: Response) => {
 /* ====================== 
       nodeVersion()
 ====================== */
+// e.g., "nodeVersion": "v26.7.0",
 
 export const nodeVersion = async (req: Request, res: Response) => {
   return res.status(200).json({
@@ -43,17 +44,24 @@ export const nodeVersion = async (req: Request, res: Response) => {
 /* ====================== 
     postgresVersion()
 ====================== */
+// This can be used to check the server version of the Render Postgres database.
+// Or you can just check the version through PgAdmin. Currently, the Render Postgres
+// version seems to be: 18.4 (Debian 18.4-1.pgdg12+1). The version I'm using locally
+// is "18.4 (Debian 18.4-1.pgdg13+1)".
 
 export const postgresVersion = async (req: Request, res: Response) => {
   try {
-    // Get Postgres version using prisma - proabably a raw query.
-    const result = await prisma.$queryRaw<{ version: string }[]>`SELECT version()`
+    // const result = await prisma.$queryRaw<{ version: string }[]>`SELECT version()`
+    // [ { version: 'PostgreSQL 18.4 (Debian 18.4-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit'}]
 
-    console.log('result: ', result)
+    const result = await prisma.$queryRaw<{ server_version: string }[]>`SHOW server_version`
+    const serverVersion = result[0]?.server_version ?? null
+    const postgresVersion = serverVersion ? serverVersion.split(' ')[0] : null
 
     return res.status(200).json({
       data: {
-        postgresVestion: result[0]?.version ?? null
+        postgresVersion,
+        serverVersion
       },
       message: 'success',
       success: true
