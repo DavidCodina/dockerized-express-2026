@@ -6,16 +6,26 @@
 # The next step is to deploy the production build.
 # One you've got a handle on that, begin to integrated the database + Prisma back in.
 #
+# If you prefer, you can switch to having Dockerfile.dev and Dockerfile.prod.
+# Then reference them in each respective .yaml file:
+#
+#   build:
+#     context: .
+#     dockerfile: Dockerfile.dev | Dockerfile.prod
+#
+#
+# That said, it's better to stick with a single Dockerfile because it leverages stage reuse.
+#
 #--------------------------------------------------------------------------
 
-# 1.  ---- deps: install all deps (needed to run the TS build) ----
+# 1. deps: install all deps (needed to run the TS build)
 FROM node:26-alpine3.23 AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 # npm ci instead of npm install — deterministic installs from the lockfile, which you want for reproducible builds.
 RUN npm ci
 
-# 2.  ---- build: compile TypeScript -> dist ----
+# 2. build: compile TypeScript -> dist
 FROM deps AS build
 #--------------------------------------------------------------------------
 #
@@ -46,7 +56,7 @@ COPY . .
 # The `npm run build` will run your "prebuild" script (npx prisma generate) if you kept it in package.json
 RUN npm run build
 
-# 3.  ---- prod-deps: install only production deps ----
+# 3. prod-deps: install only production deps
 FROM node:26-alpine3.23 AS prod-deps
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -55,10 +65,10 @@ RUN npm ci --omit=dev
 
 
 #--------------------------------------------------------------------------
-#
+#                 Top Level Stages: development | production
 #--------------------------------------------------------------------------
 
-# 4. 
+# 4. development:
 # When npm run docker:up runs, it executes: docker compose -f docker-compose.dev.yaml up --watch.
 # That compose file has build.target: development, which tells Docker: "only build stage 4 (and whatever it depends on) — ignore everything else."
 # So... It grabs step 1, then runs the rest of 4 here.
@@ -68,7 +78,7 @@ COPY . .
 EXPOSE 5000
 CMD ["npm", "run", "dev"]
 
-# 5. 
+# 5. production:
 # When npm run docker:prod:up runs, it executes: docker compose --env-file .env.production -f docker-compose.prod.yaml up -d --build",
 # Docker walks the dependency graph backward from there and builds only what stage 5 actually needs:
 # 5 <-- 3, 5 <-- 2 <-- 1
@@ -136,7 +146,6 @@ USER nodejs
 EXPOSE 5000 
 ENTRYPOINT ["/app/docker-prod-entrypoint.sh"]
 CMD ["node", "dist/index.js"]
-
 
 
 #--------------------------------------------------------------------------

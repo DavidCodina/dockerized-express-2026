@@ -1,5 +1,12 @@
 # Todo: Have Claude review this.
 
+# Todo: Make sure tests run.
+## I think that in order to run the tests within the a running container, we need to change
+## Some of our commands. For example, instead of doing:
+## "test": "vitest", we'd need to do
+## docker exec -it NODE_CONTAINER npm run test
+##
+
 # Todo: Switch to a CI/CD with GitHub Actions and/or Workflows.
 ## Add a development branch.
 ## Review render for staging solutions.
@@ -22,7 +29,10 @@ services:
       # target: development tells Docker "stop building once you've completed the stage named development".
       # and that name is resolved by literally matching against the AS <name> labels in your Dockerfile.
       # It's a plain string lookup, nothing more clever than that.
+
       target: development
+
+      # dockerfile: Dockerfile.dev
     container_name: NODE_CONTAINER
     # This will run whenever you do `docker compose up --watch`. In other words, whenever you initialize a new container.
     # However, the logic for running migrations (i.e., `npx prisma migrate deploy`) will NOT run every time the application
