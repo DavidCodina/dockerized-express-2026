@@ -1,17 +1,5 @@
 # Todo: Have Claude review this.
 
-# Todo: Make sure tests run.
-## I think that in order to run the tests within the a running container, we need to change
-## Some of our commands. For example, instead of doing:
-## "test": "vitest", we'd need to do
-## docker exec -it NODE_CONTAINER npm run test
-## That said,  the standard npm run test still works.
-## In fact, changing a passing test to a failing test when running the exect -it version doesn't seem to automatically retrigger vitest.
-## Is that expected behavior?
-## We need to consult AI on what the standard practice is here.
-## Stephen Grider explains this exact issue here:
-## https://www.udemy.com/course/docker-and-kubernetes-the-complete-guide/learn/lecture/11437080#overview
-
 # Todo: Switch to a CI/CD with GitHub Actions and/or Workflows.
 ## Add a development branch.
 ## Review render for staging solutions.
@@ -22,8 +10,7 @@
 
 # Todo: Have Claude review all of the watch section.
 
-# Todo: Ask AI why this isn't conflicting with my homebrew Postgres on my machine.
-## Why no port collision?
+# Todo: Why no 5432 port collision with local homebrew Postgres.
 
 services:
   api:
@@ -65,7 +52,9 @@ services:
     #   docker exec -it NODE_CONTAINER npm run test
     #
     # For whatever reason, that resync process doesn't communicate with the already-running
-    # Vitest watcher.
+    # Vitest watcher. Stephen Grider explains this exact issue here:
+    #
+    #   https://www.udemy.com/course/docker-and-kubernetes-the-complete-guide/learn/lecture/11437080#overview
     #
     #------------------------
     #
