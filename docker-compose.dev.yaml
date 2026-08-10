@@ -5,7 +5,12 @@
 ## Some of our commands. For example, instead of doing:
 ## "test": "vitest", we'd need to do
 ## docker exec -it NODE_CONTAINER npm run test
-##
+## That said,  the standard npm run test still works.
+## In fact, changing a passing test to a failing test when running the exect -it version doesn't seem to automatically retrigger vitest.
+## Is that expected behavior?
+## We need to consult AI on what the standard practice is here.
+## Stephen Grider explains this exact issue here:
+## https://www.udemy.com/course/docker-and-kubernetes-the-complete-guide/learn/lecture/11437080#overview
 
 # Todo: Switch to a CI/CD with GitHub Actions and/or Workflows.
 ## Add a development branch.
@@ -18,6 +23,7 @@
 # Todo: Have Claude review all of the watch section.
 
 # Todo: Ask AI why this isn't conflicting with my homebrew Postgres on my machine.
+## Why no port collision?
 
 services:
   api:
@@ -29,9 +35,7 @@ services:
       # target: development tells Docker "stop building once you've completed the stage named development".
       # and that name is resolved by literally matching against the AS <name> labels in your Dockerfile.
       # It's a plain string lookup, nothing more clever than that.
-
       target: development
-
       # dockerfile: Dockerfile.dev
     container_name: NODE_CONTAINER
     # This will run whenever you do `docker compose up --watch`. In other words, whenever you initialize a new container.
@@ -41,29 +45,66 @@ services:
     command: ['npm', 'run', 'dev']
     ports:
       - '${PORT}:${PORT}'
-      # - '5000:5000'
     env_file:
       - .env
     volumes:
+      - .:/app
+      # Without this, .:/app would also mount your host node_modules into the Linux container. That causes problems because
+      # native packages (esbuild, Prisma, etc.) are compiled for macOS on your machine
+      # The container runs Linux and needs Linux binaries
       - node_modules:/app/node_modules
-      - ./prisma:/app/prisma
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./src
-          target: /app/src
-        - action: rebuild
-          path: ./docker-entrypoint.sh
-        - action: rebuild
-          path: ./package.json
-        - action: rebuild
-          path: ./package-lock.json
-        - action: rebuild
-          path: ./prisma/schema.prisma
-        - action: rebuild
-          path: ./prisma.config.ts
-        - action: rebuild
-          path: ./tsconfig.json
+      # - ./prisma:/app/prisma
+
+    #--------------------------------------------------------------------------
+    #
+    # Previously I was doing this, plus the above ./prisma:/app/prisma
+    # The develop/watch solution would resync when application code changed.
+    # However, if we had a separate test watcher running withing the container,
+    # it would not get retriggered:
+    #
+    #   docker exec -it NODE_CONTAINER npm run test
+    #
+    # For whatever reason, that resync process doesn't communicate with the already-running
+    # Vitest watcher.
+    #
+    #------------------------
+    #
+    # What happens when we change package.json install new dependencies?
+    # When you change package.json or package-lock.json, run install inside the container once
+    # (or is npm ci prefereable).
+    #
+    #   docker exec -it NODE_CONTAINER npm install
+    #
+    # Or rebuild if you prefer a clean slate:
+    #
+    # docker compose -f docker-compose.dev.yaml up --build
+    #
+    #------------------------
+    #
+    # Why Does develop.watch Exists At All?
+    #
+    # It's useful when you don't bind-mount source — e.g. you want the container
+    # filesystem isolated and only push specific paths in.
+    #
+    #--------------------------------------------------------------------------
+
+    # develop:
+    #   watch:
+    #     - action: sync+restart
+    #       path: ./src
+    #       target: /app/src
+    #     - action: rebuild
+    #       path: ./docker-entrypoint.sh
+    #     - action: rebuild
+    #       path: ./package.json
+    #     - action: rebuild
+    #       path: ./package-lock.json
+    #     - action: rebuild
+    #       path: ./prisma/schema.prisma
+    #     - action: rebuild
+    #       path: ./prisma.config.ts
+    #     - action: rebuild
+  #       path: ./tsconfig.json
   db:
     # Using postgres is much more convenient than MySQL because cloud providers
     # like render.com and neon.com only support Postgres.

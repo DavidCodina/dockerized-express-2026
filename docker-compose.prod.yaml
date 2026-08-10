@@ -1,3 +1,22 @@
+#--------------------------------------------------------------------------
+#
+# This is a local smoke test of production image, not a deployment config.
+# In other words, this is not intended to be used as part of the deployment pipeline.
+# Is this usefule to have? Yes. It catches a different class of bugs than the development image.
+#
+# What prod local validates:
+#
+#   - Does npm run build output actually run? (dist/, pkgroll bundle, etc.)
+#   - Does the production Dockerfile stage copy everything needed? (easy to miss a file that dev bind-mount hides)
+#   - Do migrations + seed work through docker-prod-entrypoint.sh on a fresh DB?
+#   - Does the app work with production deps only? (accidental imports of dev-only packages fail here, not in dev)
+#   - Does the image run as the non-root nodejs user?
+#   - Is NODE_ENV=production behavior acceptable?
+#
+# Dev can hide production breakage. Example: dev bind-mounts your whole repo, so a missing COPY in the Dockerfile never shows up until you build the production target.
+#
+#--------------------------------------------------------------------------
+
 services:
   prod_api:
     depends_on:
@@ -13,6 +32,8 @@ services:
       - '${PORT}:${PORT}'
     env_file:
       - .env.production
+    # No volumes here - The production-like container should run
+    # the artifact built into the image, not your host filesystem.
 
   prod_db:
     image: postgres:latest
@@ -22,6 +43,9 @@ services:
       POSTGRES_USER: docker_prod_user
       POSTGRES_PASSWORD: docker_prod_password
       POSTGRES_DB: docker_prod_db
+    # ⚠️ Port collision with dev — both Postgres services map 5432:5432.
+    # You cannot run dev and prod local stacks at the same time.
+    # If that matters, map prod to 5433:5432.
     ports:
       - '5432:5432'
     volumes:

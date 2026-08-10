@@ -7,7 +7,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "docker:up": "docker compose -f docker-compose.dev.yaml up --watch",
+    "docker:up": "docker compose -f docker-compose.dev.yaml up",
     "docker:down": "docker compose -f docker-compose.dev.yaml down --rmi local -v",
     "NOTE": "The docker:prod:up script is not intended for production deployment. It's for local build testing.",
     "docker:prod:up": "docker compose --env-file .env.production -f docker-compose.prod.yaml up --build",
