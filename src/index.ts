@@ -7,7 +7,6 @@ import morgan from 'morgan'
 import 'source-map-support/register.js'
 
 import { errorHandler, notFound } from '@/middleware/errorMiddleware'
-import indexRoute from './routes'
 import testRoutes from './routes/testRoutes'
 import postRoutes from './routes/postRoutes'
 
@@ -55,13 +54,43 @@ app.use(cors(/* corsOptions */))
 app.use(express.json({}))
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
-app.use('/', express.static(path.join(__dirname, 'public')))
+
+///////////////////////////////////////////////////////////////////////////
+//
+// ⚠️ Note: tsc will ignore public/, and pkgroll will ignore it too, so nothing copies it into dist/ at build time.
+// However, for production, static assets in Express should be served directly from the project root, not from dist/.
+//
+//   app/
+//     dist/
+//     public/
+//     package.json
+//     node_modueles
+//     prisma/
+//     prisma.config.ts
+//     docker-prod-entrypoint.sh
+//
+//
+// In order to make this happen, step 5 in Dockerfile includes this line:
+//
+//   COPY public ./public
+//
+// The ultimate result is that the index.html can now be accessed not only from /api, but also from '/', and '/index.htm'.
+//
+///////////////////////////////////////////////////////////////////////////
+
+app.use('/', express.static('public'))
 
 /* ======================
         Routes
 ====================== */
 
-app.use('/api', indexRoute)
+app.get('/api', (_req, res) => {
+  const ROOT = path.join(__dirname, '..')
+  const filePath = path.join(ROOT, 'public', 'index.html')
+  // console.log('\nLooking for file at:', filePath)
+  res.sendFile(filePath)
+})
+
 app.use('/api', testRoutes)
 app.use('/api/posts', postRoutes)
 app.use(notFound)

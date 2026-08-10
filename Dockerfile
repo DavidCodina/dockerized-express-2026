@@ -35,6 +35,8 @@ FROM deps AS build
 # Solution: Create a dummy DATABASE_URL.
 # This should not affect the production deployment because
 # 1. Multi-stage builds don't carry ENV/ARG across stages.
+#    DATABASE_URL does not persist. The ARG/ENV combo in build is scoped to that stage only. 
+#    Stage 5 never re-declares it, so the dummy build-time value doesn't leak into the running production container.
 # 2. Even if it somehow did carry over, Render's runtime env var would win anyway.
 #
 #--------------------------------------------------------------------------
@@ -84,6 +86,8 @@ COPY package.json ./
 # Copy Prisma schema + migrations so the entrypoint can run `prisma migrate deploy`
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/prisma.config.ts ./prisma.config.ts
+
+COPY public ./public
 
 #--------------------------------------------------------------------------
 #
@@ -135,4 +139,21 @@ CMD ["node", "dist/index.js"]
 
 
 
-
+#--------------------------------------------------------------------------
+#
+# Everything copied over to stage 5 is as follows:
+#
+#   app/
+#     dist/
+#     public/
+#     package.json
+#     node_modueles
+#     prisma/
+#     prisma.config.ts
+#     docker-prod-entrypoint.sh
+#
+# Note: No package-lock.json in the final image. You copy package.json but never the lockfile into stage 5. 
+# Harmless at runtime (nothing needs it post-install), but worth knowing if you ever want to npm ci inside 
+# the running container for debugging.
+#
+#--------------------------------------------------------------------------

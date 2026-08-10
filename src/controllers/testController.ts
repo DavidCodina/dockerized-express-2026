@@ -42,6 +42,30 @@ export const nodeVersion = async (req: Request, res: Response) => {
 }
 
 /* ====================== 
+      portNumber()
+====================== */
+
+export const portNumber = async (req: Request, res: Response) => {
+  try {
+    const portNumber = process.env.PORT
+
+    return res.status(200).json({
+      data: {
+        portNumber
+      },
+      message: 'success',
+      success: true
+    })
+  } catch (_err) {
+    return res.status(500).json({
+      data: null,
+      message: 'Server error.',
+      success: false
+    })
+  }
+}
+
+/* ====================== 
     postgresVersion()
 ====================== */
 // This can be used to check the server version of the Render Postgres database.
