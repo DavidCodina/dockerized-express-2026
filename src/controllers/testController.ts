@@ -44,6 +44,7 @@ export const nodeVersion = async (req: Request, res: Response) => {
 /* ====================== 
       portNumber()
 ====================== */
+// The Render port number when deployed is "10000".
 
 export const portNumber = async (req: Request, res: Response) => {
   try {

@@ -1,16 +1,16 @@
 # Todo: Have Claude review this.
 
+# Todo: Switch to a CI/CD with GitHub Actions and/or Workflows.
+## Add a development branch.
+## Review render for staging solutions.
+
+# Todo: Review docker:up, docker:down, docker:prod:up, docker:prod:down
+
 # Todo: Have Claude fix docker-entrypoint.sh
 
 # Todo: Have Claude review all of the watch section.
 
 # Todo: Ask AI why this isn't conflicting with my homebrew Postgres on my machine.
-
-# Todo: Tell Claude about how I want to push to render.com, but also use a PostgreSQL database from render.com for production.
-## You'll also have to make sure that you have separate logic for a Prisma client in production that uses the specific implementation
-## needed by render.com.
-## Note: we may not actually need a multi-stage build if production is just going to use GitHub Container Registry.
-## Actually, I think we still need a multi-stage build...
 
 services:
   api:
