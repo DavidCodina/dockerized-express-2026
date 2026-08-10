@@ -40,7 +40,7 @@ services:
       # native packages (esbuild, Prisma, etc.) are compiled for macOS on your machine
       # The container runs Linux and needs Linux binaries
       - node_modules:/app/node_modules
-      # - ./prisma:/app/prisma
+      # ❌ - ./prisma:/app/prisma
 
     #--------------------------------------------------------------------------
     #
@@ -77,7 +77,7 @@ services:
     #
     #--------------------------------------------------------------------------
 
-    # develop:
+    # ❌ develop:
     #   watch:
     #     - action: sync+restart
     #       path: ./src
@@ -93,7 +93,7 @@ services:
     #     - action: rebuild
     #       path: ./prisma.config.ts
     #     - action: rebuild
-  #       path: ./tsconfig.json
+    #       path: ./tsconfig.json
   db:
     # Using postgres is much more convenient than MySQL because cloud providers
     # like render.com and neon.com only support Postgres.
@@ -133,7 +133,7 @@ volumes:
 
 #--------------------------------------------------------------------------
 #
-# Hack into the database when the container is running:
+# To access database the database when the container is running do this:
 #
 #   docker exec -it POSTGRES_CONTAINER psql -U docker_user -d docker_db
 #   SELECT id, title, body FROM posts;
