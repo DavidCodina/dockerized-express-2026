@@ -8,14 +8,17 @@ const router = Router()
 //   res.sendFile(path.join(__dirname, 'public', 'index.html'))
 // })
 
+//! This doesn't work in production build
 router.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
 
+//! This doesn't work in development.
 router.get('/index', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
 
+//! This doesn't work in production build
 router.get('/index.html', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })

@@ -1,16 +1,15 @@
 import path from 'path'
 import * as dotenv from 'dotenv'
-import express, { Request, Response /*, NextFunction */ } from 'express'
+import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-
 import morgan from 'morgan'
 import 'source-map-support/register.js'
 
 import { errorHandler, notFound } from '@/middleware/errorMiddleware'
 import indexRoute from './routes'
-
-import prisma from '@/prisma'
+import testRoutes from './routes/testRoutes'
+import postRoutes from './routes/postRoutes'
 
 dotenv.config()
 const app = express()
@@ -61,149 +60,10 @@ app.use('/', express.static(path.join(__dirname, 'public')))
 /* ======================
         Routes
 ====================== */
-// Note that whenever possible the routes reflect the
-// name of the collections (i.e., they are plural)
 
 app.use('/api', indexRoute)
-
-app.get('/api/health-check', (req, res) => {
-  const time = new Date().toLocaleTimeString('en-US', {
-    hour12: true,
-    hour: 'numeric',
-    minute: '2-digit',
-    second: '2-digit'
-  })
-
-  const test = process.env.TEST || 'TEST variable not found.'
-
-  res.status(200).json({
-    code: 'OK',
-    data: {
-      time,
-      nodeVersion: process.version,
-      nodeEnv: process.env.NODE_ENV,
-      test: test
-    },
-    message: 'success',
-    success: true
-  })
-})
-
-app.get('/api/node-version', (req, res) => {
-  res.json({
-    nodeVersion: process.version,
-    nodeEnv: process.env.NODE_ENV,
-    test: 'Testing 54321...'
-  })
-})
-
-app.get('/api/posts', async (req: Request, res: Response) => {
-  try {
-    const posts = await prisma.post.findMany({
-      orderBy: {
-        createdAt: 'desc'
-      }
-    })
-
-    /* ======================
-        Existence Check
-    ====================== */
-
-    if (!posts) {
-      return res.status(404).json({
-        data: null,
-        message: 'Resource not found.',
-        success: false
-      })
-    }
-
-    /* ======================
-            Response
-    ====================== */
-
-    return res.status(200).json({
-      data: posts,
-      message: 'success',
-      success: true
-    })
-  } catch (_err) {
-    // if (err instanceof Error) { console.log({ name: err.name, message: err.message }) }
-
-    return res.status(500).json({
-      data: null,
-      message: 'Server error.',
-
-      success: false
-    })
-  }
-})
-
-app.post('/api/posts', async (req: Request, res: Response) => {
-  try {
-    const { title, body } = req.body
-
-    /* ======================
-            Validation
-    ====================== */
-
-    if (!title || !body) {
-      return res.status(400).json({
-        data: null,
-        message: 'Missing required fields: title and body.',
-        success: false
-      })
-    }
-
-    /* ======================
-            Create Post
-    ====================== */
-
-    const newPost = await prisma.post.create({
-      data: {
-        title,
-        body
-      }
-    })
-
-    /* ======================
-            Response
-    ====================== */
-
-    return res.status(201).json({
-      data: newPost,
-      message: 'Post created successfully.',
-      success: true
-    })
-  } catch (err: any) {
-    /* ======================
-            Unique Error
-    ====================== */
-
-    if (err.code === 'P2002') {
-      return res.status(409).json({
-        data: null,
-        message: 'A post with that title already exists.',
-        success: false
-      })
-    }
-
-    /* ======================
-          Server Error
-    ====================== */
-
-    console.log('err from posts:', err)
-    return res.status(500).json({
-      data: null,
-      message: 'Server error.',
-      success: false
-    })
-  }
-})
-
-/* ======================
-
-====================== */
-
+app.use('/api', testRoutes)
+app.use('/api/posts', postRoutes)
 app.use(notFound)
 app.use(errorHandler)
 

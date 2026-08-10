@@ -20,7 +20,7 @@ const posts = [
 ======================================================================== */
 
 async function main() {
-  // Check if posts already exist
+  // Check if posts already exist.
   const postCount = await prisma.post.count()
 
   if (postCount === 0) {
