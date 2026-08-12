@@ -4,6 +4,10 @@ set -e
 
 ## Gotcha: does not wait for Postgres to be ready before running prisma generate, prisma migrate deploy, and prisma db seed. That will cause race conditions.
 ## Add a pg_isready loop at the top of the script so Prisma commands only run after the DB is accepting connections.
+
+
+#! This also seems really problematic. It requires you to manually delete the .migrated file from the host if you're
+#! recreating the container.
 FLAG_FILE="/app/.migrated"
 
 # Only run migrations if the flag file DOES NOT exist

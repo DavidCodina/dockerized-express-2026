@@ -24,9 +24,10 @@
 FROM node:26-alpine3.23 AS deps
 WORKDIR /app
 
+
+# COPY package*.json .
 # If you go this route, the forward slash is required.
-# COPY package.json package-lock.json ./
-COPY package*.json .
+COPY package.json package-lock.json ./
 
 # npm ci instead of npm install — deterministic installs from the lockfile, which you want for reproducible builds.
 RUN npm ci
