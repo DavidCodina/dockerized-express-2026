@@ -38,11 +38,18 @@ services:
       - .env
     volumes:
       - .:/app
-      # Without this, .:/app would also mount your host node_modules into the Linux container. That causes problems because
-      # native packages (esbuild, Prisma, etc.) are compiled for macOS on your machine
-      # The container runs Linux and needs Linux binaries
-      ## Should this be an anonymous volume? Probably not, but double check.
-
+      #--------------------------------------------------------------------------
+      #
+      # Without this, .:/app would also mount your host node_modules into the Linux container. That causes
+      # problems because native packages (node-gyp, esbuild, Prisma, etc.) are compiled for macOS on your machine
+      # The container runs Linux and needs Linux binaries.  See here for more info:
+      #
+      #   https://www.udemy.com/course/docker-mastery-for-nodejs/learn/lecture/13970472#overview
+      #
+      # Note: some examples use an anonymous volue: - /app/node_modules
+      # However, it's a better practice to use a named volume.
+      #
+      #--------------------------------------------------------------------------
       - node_modules:/app/node_modules
       # ❌ - ./prisma:/app/prisma
 
@@ -127,6 +134,8 @@ services:
       # error message says it directly: the suggested container configuration for 18+ is to place
       # a single mount at /var/lib/postgresql, which will then place PostgreSQL data in a subdirectory,
       # rather than mounting /var/lib/postgresql/data directly like older versions.
+      #
+      # Note also that this is a named volume and NOT a bind mount (i.e., does NOT start with / or ./).
       #
       #--------------------------------------------------------------------------
       - pgdata:/var/lib/postgresql

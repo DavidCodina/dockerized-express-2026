@@ -14,5 +14,5 @@ coverage
 .idea
 npm-debug.log
 
-#* Newly added...
 .dockerignore
+# Could add Dockerfile

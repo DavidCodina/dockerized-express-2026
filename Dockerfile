@@ -16,19 +16,19 @@
 #
 # That said, it's better to stick with a single Dockerfile because it leverages stage reuse.
 #
+## At what point do we run tests against the production image, or can we even do that now?
+#
 #--------------------------------------------------------------------------
 
 # 1. deps: install all deps (needed to run the TS build)
 FROM node:26-alpine3.23 AS deps
 WORKDIR /app
-# Optional: Use package-lock.json* 
-# The ending * is "Copy if it's there, but don't fail if it's not."
-# That said, if it's  not there, then presumably ci will fail.
+
+# If you go this route, the forward slash is required.
 # COPY package.json package-lock.json ./
 COPY package*.json .
 
 # npm ci instead of npm install — deterministic installs from the lockfile, which you want for reproducible builds.
-## Should we add: && npm cache clean --force?
 RUN npm ci
 
 # 2. build: compile TypeScript -> dist
