@@ -11,13 +11,12 @@
 
 # Todo: Have Claude fix docker-entrypoint.sh
 
-# Todo: Have Claude review all of the watch section.
-
 name: dev_express_psql # Compose enforces lowercase for project names.
 services:
   api:
     depends_on:
       db:
+        # This only works in compose version >= 2.3 and < 3.0
         condition: service_healthy
     build:
       context: .
@@ -111,7 +110,8 @@ services:
     # like render.com and neon.com only support Postgres.
     image: postgres:latest
     container_name: POSTGRES_CONTAINER
-    restart: unless-stopped # Or: always
+    ## Do we even need restart if we're already using depends_on + service_healthy?
+    restart: unless-stopped # Or: always - the default is off.
     environment:
       POSTGRES_USER: docker_user
       POSTGRES_PASSWORD: docker_password
@@ -148,12 +148,21 @@ services:
       # - ./init:/docker-entrypoint-initdb.d
       #
       #--------------------------------------------------------------------------
-    # Todo: Make sure this is the most idiomatic health check for Postgres.
+
+    # Not also that the real long-term solution is to build waits and restarts into the Express application's database.
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U docker_user -d docker_db']
+      # test: ['CMD-SHELL', 'pg_isready -U docker_user -d docker_db']
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+
       interval: 5s
       timeout: 5s
       retries: 10
+      # start_period gives the container a grace window after startup where
+      # failed checks don't count against `retries` (they're not counted as
+      # failures at all, and don't trigger "unhealthy" status). Once
+      # start_period elapses, failures start counting normally. This is
+      # meant to cover slow/variable startup work, not steady-state hiccups.
+      start_period: 5s
 volumes:
   node_modules:
   pgdata:
@@ -164,5 +173,9 @@ volumes:
 #
 #   docker exec -it POSTGRES_CONTAINER psql -U docker_user -d docker_db
 #   SELECT id, title, body FROM posts;
+#
+# This should also work:
+#
+#   docker compose exec db psql -U docker_user -d docker_db
 #
 #--------------------------------------------------------------------------
