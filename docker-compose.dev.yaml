@@ -111,12 +111,12 @@ services:
       POSTGRES_USER: docker_user
       POSTGRES_PASSWORD: docker_password
       POSTGRES_DB: docker_db
-    ports:
-      # This is not needed for the api to communicate wit the db.
-      # That connection happens over Docker's internal network, where containers
-      # can reach each other by service name. This would only be important if you wanted
-      # to use PgAdmin on your host machine.
-      # - '5432:5432'
+    # This is not needed for the api to communicate wit the db.
+    # That connection happens over Docker's internal network, where containers
+    # can reach each other by service name. This would only be important if you wanted
+    # to use PgAdmin on your host machine.
+    # ports:
+    #   - '5432:5432'
     volumes:
       # The official Postgres image's actual data directory is /var/lib/postgresql/data
       # However, I was running into issues with that.
