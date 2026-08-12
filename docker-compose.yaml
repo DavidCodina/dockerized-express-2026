@@ -120,8 +120,8 @@ services:
     # That connection happens over Docker's internal network, where containers
     # can reach each other by service name. This would only be important if you wanted
     # to use PgAdmin on your host machine.
-    # ports:
-    #   - '5432:5432'
+    ports:
+      - '5432:5432'
     volumes:
       #--------------------------------------------------------------------------
       #
@@ -151,9 +151,8 @@ services:
 
     # Not also that the real long-term solution is to build waits and restarts into the Express application's database.
     healthcheck:
-      # test: ['CMD-SHELL', 'pg_isready -U docker_user -d docker_db']
-      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
-
+      test: ['CMD-SHELL', 'pg_isready -U docker_user -d docker_db']
+      #! test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
       interval: 5s
       timeout: 5s
       retries: 10
@@ -162,7 +161,7 @@ services:
       # failures at all, and don't trigger "unhealthy" status). Once
       # start_period elapses, failures start counting normally. This is
       # meant to cover slow/variable startup work, not steady-state hiccups.
-      start_period: 5s
+      #!  start_period: 5s
 volumes:
   node_modules:
   pgdata:

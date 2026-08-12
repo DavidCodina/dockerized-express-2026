@@ -34,12 +34,13 @@ export const getPosts = async (req: Request, res: Response) => {
       message: 'success',
       success: true
     })
-  } catch (_err) {
+  } catch (err) {
     // if (err instanceof Error) { console.log({ name: err.name, message: err.message }) }
 
+    console.log(err)
     return res.status(500).json({
       data: null,
-      message: 'Server error.',
+      message: err instanceof Error ? err.message : 'Server error.',
       success: false
     })
   }
