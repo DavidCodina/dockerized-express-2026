@@ -13,3 +13,6 @@ coverage
 .vscode
 .idea
 npm-debug.log
+
+#* Newly added...
+.dockerignore

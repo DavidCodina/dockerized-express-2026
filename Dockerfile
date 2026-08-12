@@ -21,8 +21,14 @@
 # 1. deps: install all deps (needed to run the TS build)
 FROM node:26-alpine3.23 AS deps
 WORKDIR /app
-COPY package.json package-lock.json ./
+# Optional: Use package-lock.json* 
+# The ending * is "Copy if it's there, but don't fail if it's not."
+# That said, if it's  not there, then presumably ci will fail.
+# COPY package.json package-lock.json ./
+COPY package*.json .
+
 # npm ci instead of npm install — deterministic installs from the lockfile, which you want for reproducible builds.
+## Should we add: && npm cache clean --force?
 RUN npm ci
 
 # 2. build: compile TypeScript -> dist
@@ -60,7 +66,7 @@ RUN npm run build
 FROM node:26-alpine3.23 AS prod-deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-# Make sure prisma is NOT a dev dependency!
+# ⚠️ Make sure prisma is NOT a dev dependency! It's still needed.
 RUN npm ci --omit=dev
 
 
@@ -68,20 +74,39 @@ RUN npm ci --omit=dev
 #                 Top Level Stages: development | production
 #--------------------------------------------------------------------------
 
+#--------------------------------------------------------------------------
+#
 # 4. development:
-# When npm run docker:up runs, it executes: docker compose -f docker-compose.dev.yaml up --watch.
+#
+# When npm run docker:up runs, it executes:
+#
+#   docker compose -f docker-compose.dev.yaml up
+#
 # That compose file has build.target: development, which tells Docker: "only build stage 4 (and whatever it depends on) — ignore everything else."
 # So... It grabs step 1, then runs the rest of 4 here.
+#
+#--------------------------------------------------------------------------
+
 FROM deps AS development
 WORKDIR /app
-COPY . .
+# Make sure node_modules is in .dockerignore
+COPY . . 
 EXPOSE 5000
 CMD ["npm", "run", "dev"]
 
+#--------------------------------------------------------------------------
+#
 # 5. production:
-# When npm run docker:prod:up runs, it executes: docker compose --env-file .env.production -f docker-compose.prod.yaml up -d --build",
+#
+# When npm run docker:prod:up runs, it executes:
+#
+#   docker compose -f docker-compose.dev.yaml down --rmi local -v
+#
 # Docker walks the dependency graph backward from there and builds only what stage 5 actually needs:
 # 5 <-- 3, 5 <-- 2 <-- 1
+#
+#--------------------------------------------------------------------------
+
 FROM node:26-alpine3.23 AS production
 WORKDIR /app
 ENV NODE_ENV=production
@@ -100,6 +125,8 @@ COPY --from=build /app/prisma.config.ts ./prisma.config.ts
 COPY public ./public
 
 #--------------------------------------------------------------------------
+#
+# Least Privilege:
 #
 # By default, if you never specify a USER, a container runs its process as root.
 # That's not the same as root on your actual machine, but it's still more privilege than your Node app needs.
@@ -123,6 +150,18 @@ COPY public ./public
 # -S again means "system user" — no password prompt, no home directory setup, nothing interactive. 
 # It's built specifically to be a lightweight service account, not someone who'll ever log in. 
 #
+# Note: doing this could cause issues if you try to do certain commands in the container.
+# However, you can also do this: docker compose exec -u root ...
+#
+# See here fore more info:
+#
+#   https://www.udemy.com/course/docker-mastery-for-nodejs/learn/lecture/13970558#overview
+#   https://www.udemy.com/course/docker-mastery-for-nodejs/learn/lecture/14274050#overview
+#
+## Rather than doing this, can we instead do this:
+##
+## USER node
+# 
 #--------------------------------------------------------------------------
 
 RUN addgroup -S nodejs && adduser -S nodejs -G nodejs
@@ -146,7 +185,6 @@ USER nodejs
 EXPOSE 5000 
 ENTRYPOINT ["/app/docker-prod-entrypoint.sh"]
 CMD ["node", "dist/index.js"]
-
 
 #--------------------------------------------------------------------------
 #

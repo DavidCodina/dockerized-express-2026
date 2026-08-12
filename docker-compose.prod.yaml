@@ -17,6 +17,7 @@
 #
 #--------------------------------------------------------------------------
 
+name: prod_express_psql # Compose enforces lowercase for project names.
 services:
   prod_api:
     depends_on:

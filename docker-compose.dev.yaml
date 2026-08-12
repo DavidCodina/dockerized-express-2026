@@ -1,8 +1,13 @@
 # Todo: Have Claude review this.
 
+# Todo: Switch docker-compose.dev.yaml to just docker-compose.yaml.
+
 # Todo: Switch to a CI/CD with GitHub Actions and/or Workflows.
 ## Add a development branch.
 ## Review render for staging solutions.
+
+# Todo: Should we add back rimraf as part of the prebuild?
+## And if so, should it run inside of the container?
 
 # Todo: Review docker:up, docker:down, docker:prod:up, docker:prod:down
 
@@ -10,8 +15,7 @@
 
 # Todo: Have Claude review all of the watch section.
 
-# Todo: Why no 5432 port collision with local homebrew Postgres.
-
+name: dev_express_psql # Compose enforces lowercase for project names.
 services:
   api:
     depends_on:
@@ -39,6 +43,8 @@ services:
       # Without this, .:/app would also mount your host node_modules into the Linux container. That causes problems because
       # native packages (esbuild, Prisma, etc.) are compiled for macOS on your machine
       # The container runs Linux and needs Linux binaries
+      ## Should this be an anonymous volume? Probably not, but double check.
+
       - node_modules:/app/node_modules
       # ❌ - ./prisma:/app/prisma
 
@@ -94,20 +100,24 @@ services:
     #       path: ./prisma.config.ts
     #     - action: rebuild
     #       path: ./tsconfig.json
+
   db:
     # Using postgres is much more convenient than MySQL because cloud providers
     # like render.com and neon.com only support Postgres.
     image: postgres:latest
     container_name: POSTGRES_CONTAINER
-    restart: unless-stopped
+    restart: unless-stopped # Or: always
     environment:
       POSTGRES_USER: docker_user
       POSTGRES_PASSWORD: docker_password
       POSTGRES_DB: docker_db
     ports:
-      - '5432:5432'
+      # This is not needed for the api to communicate wit the db.
+      # That connection happens over Docker's internal network, where containers
+      # can reach each other by service name. This would only be important if you wanted
+      # to use PgAdmin on your host machine.
+      # - '5432:5432'
     volumes:
-      # This is a named volume.
       # The official Postgres image's actual data directory is /var/lib/postgresql/data
       # However, I was running into issues with that.
       # ❌ - pgdata:/var/lib/postgresql/data

@@ -23,6 +23,7 @@
     "test:verbose": "vitest --reporter verbose",
     "test:run": "vitest --run",
     "test:coverage": "vitest run --coverage",
+    "docker:test": "docker exec -it NODE_CONTAINER npm run test",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix"
   },
