@@ -44,11 +44,8 @@ services:
       POSTGRES_USER: docker_prod_user
       POSTGRES_PASSWORD: docker_prod_password
       POSTGRES_DB: docker_prod_db
-    # ⚠️ Port collision with dev — both Postgres services map 5432:5432.
-    # You cannot run dev and prod local stacks at the same time.
-    # If that matters, map prod to 5433:5432.
-    ports:
-      - '5432:5432'
+    # ports:
+    #   - '5432:5432'
     volumes:
       - prod_pgdata:/var/lib/postgresql
       # - ./init:/docker-entrypoint-initdb.d
