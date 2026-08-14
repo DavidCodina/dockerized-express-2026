@@ -1,5 +1,11 @@
 # Todo: Have Claude review this.
 
+# Todo: We're not using Render's auto deploy feature, which builds the image from the Dockerfile
+## on push to main. However, we still need some way to inject testing first. Probably with a GitHub workflow.
+## Presumably, we want to run testing BEFORE the push completes and sends to Render.
+
+## Also, how does it work in Render if we want a staging deployment?
+
 # Todo: Switch to a CI/CD with GitHub Actions and/or Workflows.
 ## Add a development branch.
 ## Review render for staging solutions.

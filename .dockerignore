@@ -2,6 +2,7 @@ node_modules
 docker-compose*
 dist
 .git
+.github
 .gitignore
 *.md
 .env

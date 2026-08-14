@@ -9,9 +9,13 @@ It contains a `Dockerfile`, `docker-compose.dev.yaml`, and `docker-compose.prod.
 "docker:prod:up": "docker compose --env-file .env.production -f docker-compose.prod.yaml up --build",
 ```
 
-The `docker:prod:up`, `docker-compose.prod.yaml` and `.env.production` are not intended for production deployment. They're used only for testing the production build locally. The actual deployment is done with GitHub Container Registry in conjunction with [render.com](https://render.com/) to deploy the image.
+The `docker:prod:up`, `docker-compose.prod.yaml` and `.env.production` are not intended for production deployment. They're used only for testing the production build locally. The actual deployment is triggered by a push to `main`, which then triggers Render to build the image from the `Dockerfile`.
 
-## GitHub Container Registry + Render
+## GitHub Repository + Render Auto Deploy
+
+See Render documentation on [Building From A Dockerfile](https://render.com/docs/docker#building-from-a-dockerfile).
+
+## Alternative: GitHub Container Registry + Render
 
 **Log into GHCR:** Make sure you've created a GitHub personal access token first.
 

@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  # Only add on push if you plan on using Render to also check tests.
+  # It's what Render's "After CI Checks Pass" needs.
+  # push:
+  #   branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Install Deps
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate --config ./prisma.config.ts
+        env:
+          # Decide if your tests need a real database.
+          # If any Vitest test actually needs to talk to a real database (not just have Prisma Client generated),
+          # a dummy DATABASE_URL won't be enough — you'd need a Postgres service container in the workflow.
+          # If your tests mock the DB layer or don't touch it, the dummy value above is sufficient.
+          DATABASE_URL: postgresql://dummy_user:dummy_password@localhost:5432/dummy_db
+
+      # - name: Type Check
+      #   run: npm run typescript
+
+      # - name: Lint
+      #   run: npm run lint
+
+      - name: Run Tests
+        run: npm run test:run

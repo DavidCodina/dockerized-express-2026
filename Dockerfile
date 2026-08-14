@@ -16,8 +16,6 @@
 #
 # That said, it's better to stick with a single Dockerfile because it leverages stage reuse.
 #
-## At what point do we run tests against the production image, or can we even do that now?
-#
 #--------------------------------------------------------------------------
 
 # 1. deps: install all deps (needed to run the TS build)
@@ -194,6 +192,10 @@ RUN chown -R nodejs:nodejs /app
 #
 #--------------------------------------------------------------------------
 USER nodejs
+
+# ⚠️ Gotcha: In many casess the EXPOSE instruction is merely for documentation. 
+# However, in some cases it is used during deployment. For example, Elastic Beanstalk
+# will use it for automatic port-mapping. This is NOT the case for Render.
 EXPOSE 5000 
 ENTRYPOINT ["/app/docker-prod-entrypoint.sh"]
 CMD ["node", "dist/index.js"]
