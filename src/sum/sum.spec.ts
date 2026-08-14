@@ -27,7 +27,8 @@ describe('The sum() function...', () => {
 
   it('should return same number when only one arg', () => {
     const value = sum(5)
-    expect(value).toBe(5)
+    // ❌ Intentionally wrong to test .github/workflows/ci.yml on pull_request.
+    expect(value).toBe(4) //! Temporary
   })
 
   test('should return correct sum with multiple args', () => {
