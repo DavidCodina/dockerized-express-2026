@@ -24,6 +24,4 @@ yarn-error.log*
 # https://www.prisma.io/docs/orm/prisma-schema/overview/generators#3-exclude-the-generated-directory-from-version-control
 #! ⚠️ It's crucial that this is omitted from version control. It will contain your DB URL.
 /src/generated
-
-
 /src/generated/prisma

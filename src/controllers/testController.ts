@@ -37,7 +37,7 @@ export const nodeVersion = async (req: Request, res: Response) => {
   return res.status(200).json({
     nodeVersion: process.version,
     nodeEnv: process.env.NODE_ENV,
-    test: 'Testing 123...'
+    test: 'Testing push-to-deploy...'
   })
 }
 

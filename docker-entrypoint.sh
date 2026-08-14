@@ -6,9 +6,9 @@ set -e
 
 printf "\n\nFirst run detected! Running 'prisma generate', 'prisma migrate deploy' and 'prisma db seed'...\n\n"
 npx prisma generate --config ./prisma.config.ts
-# Keep migrate deploy, even though this is a dev image. The distinction that matters 
-# isn't  "dev build vs prod build" — it's "am I running this in an unattended script, 
-# or interactively at my keyboard while actively changing the schema?"
+# Keep migrate deploy (i.e., not migrate dev), even though this is a dev image. What
+# matters isn't "dev build vs prod build" — it's "am I running this in an unattended 
+# script, or interactively at my keyboard while actively changing the schema?"
 npx prisma migrate deploy
 
 #--------------------------------------------------------------------------
