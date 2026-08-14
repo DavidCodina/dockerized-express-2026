@@ -42,3 +42,12 @@ docker pull ghcr.io/davidcodina/express-image:v1
 ```
 
 Make sure to also add the optional credential info, since the GHCR image is private by default. Finally, click the **Connect** button and step through the rest of the basic instructions to deploy.
+
+## CI Workflow
+
+The `.github/workflows/ci.yml` prevents merging pull requests to `main` when tests fail. This is enforced by branch protection on `main` that:
+
+- Restricts deletions
+- Requires a pull request before merging
+- Requires status checks to pass
+- Blocks force pushes
