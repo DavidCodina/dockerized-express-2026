@@ -36,8 +36,6 @@ export const getPosts = async (req: Request, res: Response) => {
     })
   } catch (err) {
     // if (err instanceof Error) { console.log({ name: err.name, message: err.message }) }
-
-    console.log(err)
     return res.status(500).json({
       data: null,
       message: err instanceof Error ? err.message : 'Server error.',

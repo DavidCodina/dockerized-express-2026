@@ -91,7 +91,18 @@ RUN npm ci --omit=dev
 FROM deps AS development
 WORKDIR /app
 # Make sure node_modules is in .dockerignore
+#--------------------------------------------------------------------------
+#
+# Technically when we're doing local development, we're already bind-mounting everything from 
+#
+# - .:/app
+#
+# So we don't really need to do this step. That said, dev teams often leave it
+# in for completeness as a standalone Dockerfile, independent of the docker-compose.yaml.
+#
+#--------------------------------------------------------------------------
 COPY . . 
+
 EXPOSE 5000
 CMD ["npm", "run", "dev"]
 
