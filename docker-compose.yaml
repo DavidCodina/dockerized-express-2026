@@ -1,9 +1,9 @@
 # Todo: Have Claude review this.
 
-# Todo: Add branch protection to main. Make sure it is even enforced on admins.
-## Improve on current ci.yml with TypeScript and linting.
+## ❎ Improve on current ci.yml with TypeScript and linting.
 
-## Add protection to prevent main and development from ever being deleted.
+## Have AI review the  CI / CD setup to see if it's okay for enterpise.
+## Since I have no Travis CI, etc.
 
 ## Also, how does it work in Render if we want a staging deployment?
 
