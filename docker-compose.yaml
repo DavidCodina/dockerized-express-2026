@@ -3,7 +3,7 @@
 ## ❎ Improve on current ci.yml with TypeScript and linting.
 
 ## Have AI review the  CI / CD setup to see if it's okay for enterpise.
-## Since I have no Travis CI, etc.
+## Since I have no Travis CI, Jenkins, no staging, etc.
 
 ## Also, how does it work in Render if we want a staging deployment?
 
@@ -15,8 +15,6 @@
 ## And if so, should it run inside of the container?
 
 # Todo: Review docker:up, docker:down, docker:prod:up, docker:prod:down
-
-# Todo: Have Claude fix docker-entrypoint.sh
 
 name: dev_express_psql # Compose enforces lowercase for project names.
 services:
