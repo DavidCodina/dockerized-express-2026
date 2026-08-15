@@ -45,7 +45,7 @@ Make sure to also add the optional credential info, since the GHCR image is priv
 
 Finally, click the **Connect** button and step through the rest of the basic instructions to deploy.
 
-## CI Workflow
+## main CI
 
 The `.github/workflows/ci.yml` prevents merging pull requests to `main` when tests fail. This is enforced by branch protection on `main` that:
 
@@ -61,6 +61,6 @@ feature branches → development → staging → main
 
 - The `development` branch is highly dynamic, has its own automated CI workflow, no live deployment, and only accepts commits through pull requests.
 
-- The `staging` branch would have a live deployment and its own cloud db (i.e., full CI/CD). It generally only accepts PRs from development. It essentially would be the pre-production sanity check, rather than having an additional pre-production stage. However, `staging` wouldn't necessarily sit for weeks before getting pushed to production.
+- The `staging` branch would have a live deployment and its own cloud db (i.e., full CI/CD). It generally only accepts PRs from `development`. It essentially would be the pre-production sanity check, rather than having an additional pre-production stage. However, `staging` wouldn't necessarily sit for weeks before getting pushed to production.
 
 - The `main` branch is synonymous with production and generally only accepts PRs from `staging`. Has full CI/CD.
