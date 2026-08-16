@@ -41,6 +41,7 @@ services:
     env_file:
       - .env
     volumes:
+      ## Is there any reason why we can't do - .:/app:ro ?
       - .:/app
       #--------------------------------------------------------------------------
       #

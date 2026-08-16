@@ -65,4 +65,4 @@ feature branches → development → staging → main
 
 - The `main` branch is synonymous with production and generally only accepts PRs from `staging`. Has full CI/CD.
 
-This is roughly equivalent to the so-called the [practical strategy](https://www.youtube.com/watch?v=A3pmg8_zPgg), but with no live `development` deployment.
+This is roughly equivalent to the so-called the [practical strategy](https://www.youtube.com/watch?v=A3pmg8_zPgg).
