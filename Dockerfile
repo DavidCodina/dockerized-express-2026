@@ -98,6 +98,9 @@ WORKDIR /app
 # So we don't really need to do this step. That said, dev teams often leave it
 # in for completeness as a standalone Dockerfile, independent of the docker-compose.yaml.
 #
+# See Academind's Udemy tutoriial, section 3.58 for more on this exact point.
+# https://www.udemy.com/course/docker-kubernetes-the-practical-guide/learn/lecture/22166934#overview
+#
 #--------------------------------------------------------------------------
 COPY . . 
 
