@@ -1,3 +1,47 @@
+#--------------------------------------------------------------------------
+#
+# ⚠️ This manual deployment workflow is more of an experiment. If you want to use
+# it in production, you'll likely want to add administrative guards to it.
+#
+#------------------------
+#
+# When we manually "Run workflow", does it still matter which branch is selected?
+#
+# Yes, in two distinct ways:
+#
+#   1. It determines which commit gets deployed.
+#      When you pick "Branch: development" in that dropdown, GitHub checks out development's current tip commit to run the workflow.
+#      Inside that run, github.sha is set to that commit's SHA. So yes — selecting the branch is exactly how you control what gets deployed.
+#      If you'd picked main instead, github.sha would be main's tip, and you'd deploy that instead.
+#
+#   2. It determines which version of the workflow file itself runs.
+#      This is a subtler point worth knowing: workflow_dispatch runs the copy of deploy.yaml that exists on the branch you selected,
+#      not necessarily whatever's on main. So if you edit this workflow file on development and haven't merged it to main yet,
+#      running it "from development" uses your edited version — running it "from main" would use the old one. Right now that
+#      doesn't matter much since presumably both branches have the same file, but it's relevant if you ever tweak the workflow
+#      on a feature branch before merging.
+#
+#
+# Does this line in the yaml actually grab the last commit for that branch?
+#
+#   Yes, exactly. In a workflow_dispatch run, github.sha is the SHA of the tip commit of
+#   whichever branch/ref you selected in the dropdown at the moment you clicked "Run workflow." So:
+#
+#
+# Could we use the RENDER_DEPLOY_HOOK_URL instead of RENDER_SERVICE_ID + RENDER_API_KEY?
+#
+# Yes, but there are downsides to that approach:
+#
+#   Deploy hook with ?ref=<sha>: This can deploy a specific commit from any branch — Render's docs confirm you can pass
+#   a commit SHA this way. So technically it would work for deploying development's code. But it comes with a real side effect:
+#   using ?ref= on a deploy hook permanently disables auto-deploy for that service. So the first time you used it,
+#   the main → auto-deploy-on-push would silently stop working, and you'd have to manually re-enable it in the Render dashboard.
+#
+#   Conversely, the API with commitId in the body has the same net effect (deploys a specific commit) but Render's docs explicitly
+#   say this method does not disable auto-deploy.
+#
+#--------------------------------------------------------------------------
+
 name: Manual Deploy
 
 on:
@@ -27,32 +71,3 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
             -H "Content-Type: application/json" \
             -d "{\"commitId\": \"${{ github.sha }}\"}"
-
-# name: Manual Deploy
-
-# on:
-#   workflow_dispatch:
-#     inputs:
-#       confirm:
-#         description: "Type 'deploy' to confirm"
-#         required: true
-#         default: ''
-
-# # ❓ Is there a way to manually deploy a Docker image directly to Render?
-# jobs:
-#   deploy:
-#     runs-on: ubuntu-latest
-#     # Optional: Restrict this workflow to only run when dispatched against the development branch
-#     # if: github.ref == 'refs/heads/development'
-#     steps:
-#       - name: Guard confirmation input
-#         if: ${{ github.event.inputs.confirm != 'deploy' }}
-#         run: |
-#           echo "Confirmation input did not match 'deploy'. Aborting."
-#           exit 1
-
-#       # Two ways to trigger a Render deploy from Actions: a deploy hook URL (simplest — just a POST request)
-#       # or the Render API (needs an API key + service ID, but lets you poll for deploy status).
-#       - name: Trigger Render deploy hook
-#         run: |
-#           curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
