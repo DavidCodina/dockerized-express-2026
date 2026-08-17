@@ -1,8 +1,13 @@
 name: Playground
+## Currently, this is running everything against node-version 24, but what
+## if we want to actually run all the tests against a Docker image?
+## Review: Corresponds to lesson 8 in the FEM course.
+## https://github.com/ALT-F4-LLC/fem-cicd-service/blob/poc/.github/workflows/deploy.yml
 
 on:
   push:
     branches: [development]
+  workflow_dispatch:
 
 jobs:
   random-job:

@@ -2,6 +2,10 @@
 
 ## ❎ Improve on current ci.yml with TypeScript and linting.
 
+## Update package.json dependencies. Ensure they are all statically set (i.e., no ^ or ~).
+
+## Update TypeScript
+
 ## Create a demo React app outside of the backend dockerization.
 ## Test that a client running on localhost:3000 can connect to the backend on localhost:5000.
 
@@ -27,6 +31,10 @@
 
 # Todo: Review docker:up, docker:down, docker:prod:up, docker:prod:down
 ## Should we add --build to docker:up? That would then force the image to be rebuilt each time.
+
+## Build out full Posts CRUD, then add documentation.
+
+## Create pre-push hook to opt out of pushing to main and development.
 
 name: dev_express_psql # Compose enforces lowercase for project names.
 services:
