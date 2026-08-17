@@ -37,7 +37,7 @@ export const nodeVersion = async (req: Request, res: Response) => {
   return res.status(200).json({
     nodeVersion: process.version,
     nodeEnv: process.env.NODE_ENV,
-    test: 'Testing Manual Deployment With RENDER_DEPLOY_HOOK_URL...'
+    test: 'Testing Manual Deployment With RENDER_API_KEY...'
   })
 }
 
