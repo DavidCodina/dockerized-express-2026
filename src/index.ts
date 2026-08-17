@@ -14,7 +14,7 @@ dotenv.config()
 const app = express()
 
 //! Temporary
-export var myName = 'David'
+//! export var myName = 'David'
 
 /* ======================
     Global Middleware
