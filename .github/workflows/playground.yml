@@ -21,8 +21,8 @@ jobs:
       - name: Install Deps
         run: npm ci
 
-      # - name: Type Check
-      #   run: npm run typescript
+      - name: Type Check
+        run: npm run typescript
 
       - name: Lint
         # The current package.json `npm run lint` script will not cause the CI step to fail on warnings.

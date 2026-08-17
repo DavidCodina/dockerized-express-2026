@@ -16,6 +16,10 @@ const app = express()
 //! Temporary
 //! export var myName = 'David'
 
+let me = 123
+me = 'David'
+console.log(me)
+
 /* ======================
     Global Middleware
 ====================== */
