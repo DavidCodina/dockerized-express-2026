@@ -40,7 +40,10 @@ jobs:
       #   run: npm run typescript
 
       # - name: Lint
-      #   run: npm run lint
+      #   # The current package.json `npm run lint` script will not cause the CI step to fail on warnings.
+      #   # However, in the actual CI we want it to, so we use --max-warnings=0
+      #   # ❌ run: npm run lint
+      #   run: run: npx eslint src --max-warnings=0
 
       - name: Run Tests
         run: npm run test:run
