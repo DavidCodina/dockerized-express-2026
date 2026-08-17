@@ -1,32 +1,30 @@
-name: CI
+name: Playground
+## Currently, this is running everything against node-version 24, but what
+## if we want to actually run all the tests against a Docker image?
+## Review: Corresponds to lesson 8 in the FEM course.
+## https://github.com/ALT-F4-LLC/fem-cicd-service/blob/poc/.github/workflows/deploy.yml
 
 on:
-  # Only add on push if you plan on using Render to also check tests.
-  # It's what Render's "After CI Checks Pass" needs.
-  # push:
-  #   branches: [main]
-
-  # This runs when the PR is created, NOT when a merge is made.
-  pull_request:
-    branches: [main]
+  push:
+    branches: [development]
+  workflow_dispatch:
 
 jobs:
-  test:
+  random-job:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Use Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: 'npm'
 
       - name: Install Deps
         run: npm ci
-
         # This is necessary. Otherwise, you'll run into a TypeScript error during the Type Check step.
         # ❌ Cannot find module '@/generated/prisma/client' or its corresponding type declarations.
       - name: Generate Prisma Client
@@ -38,14 +36,11 @@ jobs:
           # If your tests mock the DB layer or don't touch it, the dummy value above is sufficient.
           DATABASE_URL: postgresql://dummy_user:dummy_password@localhost:5432/dummy_db
 
-      # - name: Type Check
-      #   run: npm run typescript
+      - name: Type Check
+        run: npm run typescript
 
-      # - name: Lint
-      #   # The current package.json `npm run lint` script will not cause the CI step to fail on warnings.
-      #   # However, in the actual CI we want it to, so we use --max-warnings=0
-      #   # ❌ run: npm run lint
-      #   run: npx eslint src --max-warnings=0
-
-      - name: Run Tests
-        run: npm run test:run
+      - name: Lint
+        # The current package.json `npm run lint` script will not cause the CI step to fail on warnings.
+        # However, in the actual CI we want it to, so we use --max-warnings=0
+        # ❌ run: npm run lint
+        run: npx eslint src --max-warnings=0
