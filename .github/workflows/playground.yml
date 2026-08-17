@@ -1,0 +1,28 @@
+name: Playground
+
+on:
+  [push]:
+    branches: [development]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Install Deps
+        run: npm ci
+
+      # - name: Type Check
+      #   run: npm run typescript
+
+      - name: Lint
+        run: npm run lint

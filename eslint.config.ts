@@ -4,8 +4,16 @@ import globals from 'globals'
 import js from '@eslint/js'
 import tseslint from 'typescript-eslint'
 
+// eslint-plugin-promise doesn't ship its own hand-written .d.ts file,
+// which is why you can end up with a TypeScript error here or below when you
+// specify: pluginPromise.configs['flat/recommended']. Having the file extension
+// here as .ts is useful for autocomplete, but it also means that for plugins with
+// no .d.ts file, you'll get a TypeScript error when you try to use them.
+
+// @ts-expect-error
 import pluginPromise from 'eslint-plugin-promise'
 import vitest from '@vitest/eslint-plugin'
+
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 
 export default defineConfig([
@@ -18,6 +26,7 @@ export default defineConfig([
   // https://eslint.org/docs/latest/rules
   js.configs.recommended,
   tseslint.configs.recommended,
+
   pluginPromise.configs['flat/recommended'],
 
   // https://github.com/vitest-dev/eslint-plugin-vitest?tab=readme-ov-file#rules

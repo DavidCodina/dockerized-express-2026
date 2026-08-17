@@ -13,6 +13,9 @@ import postRoutes from './routes/postRoutes'
 dotenv.config()
 const app = express()
 
+//! Temporary
+export var myName = 'David'
+
 /* ======================
     Global Middleware
 ====================== */

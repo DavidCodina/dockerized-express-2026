@@ -5,7 +5,13 @@
 ## Create a demo React app outside of the backend dockerization.
 ## Test that a client running on localhost:3000 can connect to the backend on localhost:5000.
 
+## Currently, there's only CI on the development branch.
+## However, it's probably better to write a ruleset so that the CI logic is pushes to all branches, other than the main branch.
+## Alternatively, have a pre-push hook.
+
 ## Update Render to user preview environment rather than service preview, depending on cost...
+## Currently, we're using a preview deployment for the Express app but it's still running
+## npx prisma migrate deploy against the production database.
 
 ## Have AI review the  CI / CD setup to see if it's okay for enterpise.
 ## Since I have no Travis CI, Jenkins, no staging, etc.
