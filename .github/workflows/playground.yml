@@ -4,6 +4,7 @@ name: Playground
 ## Review: Corresponds to lesson 8 in the FEM course.
 ## https://github.com/ALT-F4-LLC/fem-cicd-service/blob/poc/.github/workflows/deploy.yml
 
+#! We don't want this to run on pull_request to main!
 on:
   push:
     branches: [development]
