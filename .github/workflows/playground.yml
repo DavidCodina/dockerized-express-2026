@@ -1,7 +1,7 @@
 name: Playground
 
 on:
-  [push]:
+  push:
     branches: [development]
 
 jobs:
