@@ -24,6 +24,12 @@ jobs:
         # ❌ Cannot find module '@/generated/prisma/client' or its corresponding type declarations.
       - name: Generate Prisma Client
         run: npx prisma generate --config ./prisma.config.ts
+        env:
+          # Decide if your tests need a real database.
+          # If any Vitest test actually needs to talk to a real database (not just have Prisma Client generated),
+          # a dummy DATABASE_URL won't be enough — you'd need a Postgres service container in the workflow.
+          # If your tests mock the DB layer or don't touch it, the dummy value above is sufficient.
+          DATABASE_URL: postgresql://dummy_user:dummy_password@localhost:5432/dummy_db
 
       - name: Type Check
         run: npm run typescript

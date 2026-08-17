@@ -27,6 +27,8 @@ jobs:
       - name: Install Deps
         run: npm ci
 
+        # This is necessary. Otherwise, you'll run into a TypeScript error during the Type Check step.
+        # ❌ Cannot find module '@/generated/prisma/client' or its corresponding type declarations.
       - name: Generate Prisma Client
         run: npx prisma generate --config ./prisma.config.ts
         env:
