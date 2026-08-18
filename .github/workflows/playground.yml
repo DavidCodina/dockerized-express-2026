@@ -29,6 +29,7 @@ jobs:
 
       - name: Install Deps
         run: npm ci
+
         # This is necessary. Otherwise, you'll run into a TypeScript error during the Type Check step.
         # ❌ Cannot find module '@/generated/prisma/client' or its corresponding type declarations.
       - name: Generate Prisma Client
@@ -40,7 +41,7 @@ jobs:
           # If your tests mock the DB layer or don't touch it, the dummy value above is sufficient.
           DATABASE_URL: postgresql://dummy_user:dummy_password@localhost:5432/dummy_db
 
-      - name: Type Check
+      - name: TypeScript Check
         run: npm run typescript
 
       - name: Lint
@@ -104,17 +105,23 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: artifacts # Should be the same as the name used when uploading.
-          # We can probably do away with the path here.
-          # Then just do cat summary.txt below instead of cat downloaded-artifacts/summary.txt.
-          # path: downloaded-artifacts
+          #--------------------------------------------------------------------------
+          #
+          # One can set a path,
+          #
+          #   path: downloaded-artifacts
+          #
+          # Make sure to change the cat command below to:
+          #
+          #  cat downloaded-artifacts/summary.txt
+          #
+          #--------------------------------------------------------------------------
 
       - name: Log Summary
         if: needs.random-job.result == 'success'
         run: |
-          echo "▶ Contents of downloaded summary.txt:"
-          echo "-----------------------------------"
+          echo "Contents of downloaded summary.txt:"
           cat summary.txt
-          echo "-----------------------------------"
 
       - name: Log Failure & Exit
         if: needs.random-job.result != 'success'
