@@ -99,19 +99,21 @@ jobs:
           name: artifacts
           path: summary.txt
 
-      - name: Download Artifact
+      - name: Download Artifacts
         if: needs.random-job.result == 'success'
         uses: actions/download-artifact@v8
         with:
-          name: artifacts
-          path: downloaded-artifacts
+          name: artifacts # Should be the same as the name used when uploading.
+          # We can probably do away with the path here.
+          # Then just do cat summary.txt below instead of cat downloaded-artifacts/summary.txt.
+          # path: downloaded-artifacts
 
       - name: Log Summary
         if: needs.random-job.result == 'success'
         run: |
           echo "▶ Contents of downloaded summary.txt:"
           echo "-----------------------------------"
-          cat downloaded-artifacts/summary.txt
+          cat summary.txt
           echo "-----------------------------------"
 
       - name: Log Failure & Exit
