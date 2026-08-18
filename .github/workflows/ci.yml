@@ -9,6 +9,7 @@ on:
   # This runs when the PR is created, NOT when a merge is made.
   pull_request:
     branches: [main]
+    # types: [opened, synchronize, reopened]
 
 jobs:
   test:

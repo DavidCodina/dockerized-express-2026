@@ -7,7 +7,8 @@ name: Playground
 #! We don't want this to run on pull_request to main.
 on:
   push:
-    branches: [development]
+    branches: [development, feature/**] # i.e., feature/foo/bar
+    # branches-ignore: [main]
   workflow_dispatch:
 
 jobs:
