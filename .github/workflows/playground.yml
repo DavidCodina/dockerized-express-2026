@@ -94,10 +94,25 @@ jobs:
 
       - name: Upload Artifacts
         if: needs.random-job.result == 'success'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: artifacts
           path: summary.txt
+
+      - name: Download Artifact
+        if: needs.random-job.result == 'success'
+        uses: actions/download-artifact@v8
+        with:
+          name: artifacts
+          path: downloaded-artifacts
+
+      - name: Log Summary
+        if: needs.random-job.result == 'success'
+        run: |
+          echo "▶ Contents of downloaded summary.txt:"
+          echo "-----------------------------------"
+          cat downloaded-artifacts/summary.txt
+          echo "-----------------------------------"
 
       - name: Log Failure & Exit
         if: needs.random-job.result != 'success'
