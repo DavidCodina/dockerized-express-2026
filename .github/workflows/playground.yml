@@ -6,7 +6,7 @@ name: Playground
 
 ## Add "[skip ci]" to the git wip message.
 
-#! We don't want this to run on pull_request to main.
+#! We don't want this to run on pull_request to main
 on:
   push:
     branches: [development, feature/**] # i.e., feature/foo/bar
