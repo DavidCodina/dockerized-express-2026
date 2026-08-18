@@ -1,12 +1,12 @@
-name: Playground
 ## Currently, this is running everything against node-version 24, but what
 ## if we want to actually run all the tests against a Docker image?
 ## Review: Corresponds to lesson 8 in the FEM course.
 ## https://github.com/ALT-F4-LLC/fem-cicd-service/blob/poc/.github/workflows/deploy.yml
 
-## Add "[skip ci]" to the git wip message.
-
 #! We don't want this to run on pull_request to main
+
+name: Playground
+
 on:
   push:
     branches: [development, feature/**] # i.e., feature/foo/bar
@@ -73,6 +73,30 @@ jobs:
         if: needs.random-job.result == 'success'
         run: |
           echo "### Status: ✅ All checks passed successfully!" >> $GITHUB_STEP_SUMMARY
+
+      - name: Write Summary File
+        if: needs.random-job.result == 'success'
+        run: |
+          {
+            echo "CI Pipeline Results"
+            echo "===================="
+            echo "Status:      SUCCESS"
+            echo "Repository:  ${{ github.repository }}"
+            echo "Branch:      ${{ github.ref_name }}"
+            echo "Triggered by: ${{ github.actor }}"
+            echo "Event:       ${{ github.event_name }}"
+            echo "Commit SHA:  ${{ github.sha }}"
+            echo "Run ID:      ${{ github.run_id }}"
+            echo "Run number:  ${{ github.run_number }}"
+            echo "Timestamp:   $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          } >> summary.txt
+
+      - name: Upload Artifacts
+        if: needs.random-job.result == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: summary-artifact
+          path: summary.txt
 
       - name: Log Failure & Exit
         if: needs.random-job.result != 'success'
