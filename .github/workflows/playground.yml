@@ -4,7 +4,7 @@ name: Playground
 ## Review: Corresponds to lesson 8 in the FEM course.
 ## https://github.com/ALT-F4-LLC/fem-cicd-service/blob/poc/.github/workflows/deploy.yml
 
-#! We don't want this to run on pull_request to main!
+#! We don't want this to run on pull_request to main.
 on:
   push:
     branches: [development]
@@ -45,3 +45,28 @@ jobs:
         # However, in the actual CI we want it to, so we use --max-warnings=0
         # ❌ run: npm run lint
         run: npx eslint src --max-warnings=0
+
+  finished:
+    needs: random-job
+    runs-on: ubuntu-latest
+    # if: always() Execution: Ensures the finished job executes even if random-job fails,
+    # allowing you to catch errors or log notifications regardless of outcome.
+    if: always()
+    steps:
+      - name: Generate Base Summary
+        run: |
+          echo "## 🚀 CI Pipeline Results" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** \`${{ github.actor }}\` on \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: Log Success
+        if: needs.random-job.result == 'success'
+        run: |
+          echo "### Status: ✅ All checks passed successfully!" >> $GITHUB_STEP_SUMMARY
+
+      - name: Log Failure & Exit
+        if: needs.random-job.result != 'success'
+        run: |
+          echo "### Status: ❌ Type check or Lint checks failed." >> $GITHUB_STEP_SUMMARY
+          exit 1

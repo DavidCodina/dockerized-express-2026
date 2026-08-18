@@ -1,7 +1,7 @@
 #--------------------------------------------------------------------------
 #
 # ⚠️ This manual deployment workflow is more of an experiment. If you want to use
-# it in production, you'll likely want to add administrative guards to it.
+# it in production, you'll likely want to add GitHub admin guards to it.
 #
 #------------------------
 #
@@ -55,8 +55,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # Optional: Restrict this workflow to only run when dispatched against the development branch
-    # if: github.ref == 'refs/heads/development'
+    # Optional: Restrict this workflow to only run when dispatched against the main branch:
+    # if: github.ref == 'refs/heads/main'
     steps:
       - name: Guard confirmation input
         if: ${{ github.event.inputs.confirm != 'deploy' }}
