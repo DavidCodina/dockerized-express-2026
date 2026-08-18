@@ -55,7 +55,8 @@ jobs:
       - name: Output GitHub Context
         run: echo "${{ toJSON(github) }}"
 
-  finished:
+  result:
+    name: Result
     needs: random-job
     runs-on: ubuntu-latest
     # if: always() Execution: Ensures the finished job executes even if random-job fails,
@@ -93,9 +94,9 @@ jobs:
 
       - name: Upload Artifacts
         if: needs.random-job.result == 'success'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
-          name: summary-artifact
+          name: artifacts
           path: summary.txt
 
       - name: Log Failure & Exit
