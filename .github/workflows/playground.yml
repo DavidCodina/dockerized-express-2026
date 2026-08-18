@@ -46,6 +46,12 @@ jobs:
         # ❌ run: npm run lint
         run: npx eslint src --max-warnings=0
 
+  info:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Output GitHub Context
+        run: echo "${{ toJSON(github) }}"
+
   finished:
     needs: random-job
     runs-on: ubuntu-latest
@@ -56,7 +62,7 @@ jobs:
       - name: Generate Base Summary
         run: |
           echo "## 🚀 CI Pipeline Results" >> $GITHUB_STEP_SUMMARY
-          echo "**Triggered by:** \`${{ github.actor }}\` on \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered By:** \`${{ github.actor }}\` on \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
