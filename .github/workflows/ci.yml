@@ -12,5 +12,6 @@ on:
     # types: [opened, synchronize, reopened]
 
 jobs:
+  # Gotcha: Make sure the branch protection rule is now: test / reusable-test
   test:
     uses: ./.github/workflows/reusable-test.yml
