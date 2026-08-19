@@ -12,72 +12,33 @@ on:
   workflow_dispatch:
 
 jobs:
+  test-job:
+    uses: ./.github/workflows/test.yml
+
   #--------------------------------------------------------------------------
   #
   #--------------------------------------------------------------------------
 
-  random-job:
+  result:
+    name: Result
+    needs: test-job
     runs-on: ubuntu-latest
-    # This will set the associated result to 'success'. Instead, use if: always() on other jobs.
-    # ❌ continue-on-error: true
-
+    if: always()
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v5
+      - name: Generate Base Summary
+        run: |
+          echo "## 🚀 CI Pipeline Results" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered By:** \`${{ github.actor }}\` on \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-      - name: Use Node
-        uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: 'npm'
+      - name: Log Success
+        if: needs.test-job.result == 'success'
+        run: |
+          echo "### Status: ✅ All checks passed successfully!" >> $GITHUB_STEP_SUMMARY
 
-      - name: Install Deps
-        run: npm ci
-
-        # This is necessary. Otherwise, you'll run into a TypeScript error during the Type Check step.
-        # ❌ Cannot find module '@/generated/prisma/client' or its corresponding type declarations.
-      - name: Generate Prisma Client
-        run: npx prisma generate --config ./prisma.config.ts
-        env:
-          # Decide if your tests need a real database.
-          # If any Vitest test actually needs to talk to a real database (not just have Prisma Client generated),
-          # a dummy DATABASE_URL won't be enough — you'd need a Postgres service container in the workflow.
-          # If your tests mock the DB layer or don't touch it, the dummy value above is sufficient.
-          DATABASE_URL: postgresql://dummy_user:dummy_password@localhost:5432/dummy_db
-
-      - name: TypeScript Check
-        run: npm run typescript
-
-      - name: Lint
-        # The current package.json `npm run lint` script will not cause the CI step to fail on warnings.
-        # However, in the actual CI we want it to, so we use --max-warnings=0
-        # ❌ run: npm run lint
-        run: npx eslint src --max-warnings=0
-
-  #--------------------------------------------------------------------------
-  #
-  #--------------------------------------------------------------------------
-
-  # result:
-  #   name: Result
-  #   needs: random-job
-  #   runs-on: ubuntu-latest
-  #   if: always()
-  #   steps:
-  #     - name: Generate Base Summary
-  #       run: |
-  #         echo "## 🚀 CI Pipeline Results" >> $GITHUB_STEP_SUMMARY
-  #         echo "**Triggered By:** \`${{ github.actor }}\` on \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
-  #         echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-  #         echo "" >> $GITHUB_STEP_SUMMARY
-
-  #     - name: Log Success
-  #       if: needs.random-job.result == 'success'
-  #       run: |
-  #         echo "### Status: ✅ All checks passed successfully!" >> $GITHUB_STEP_SUMMARY
-
-  #     - name: Log Failure & Exit
-  #       if: needs.random-job.result != 'success'
-  #       run: |
-  #         echo "### Status: ❌ Type check or Lint checks failed." >> $GITHUB_STEP_SUMMARY
-  #         exit 1
+      - name: Log Failure & Exit
+        if: needs.test-job.result != 'success'
+        run: |
+          echo "### Status: ❌ Type check or Lint checks failed." >> $GITHUB_STEP_SUMMARY
+          exit 1

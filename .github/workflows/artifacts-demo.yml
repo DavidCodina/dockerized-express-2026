@@ -5,36 +5,7 @@ on:
 
 jobs:
   test-job:
-    runs-on: ubuntu-latest
-    # ❌ continue-on-error: true
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v5
-
-      - name: Use Node
-        uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: 'npm'
-
-      - name: Install Deps
-        run: npm ci
-
-      - name: Generate Prisma Client
-        run: npx prisma generate --config ./prisma.config.ts
-        env:
-          DATABASE_URL: postgresql://dummy_user:dummy_password@localhost:5432/dummy_db
-
-      - name: TypeScript Check
-        run: npm run typescript
-
-      - name: Lint
-        run: npx eslint src --max-warnings=0
-
-  #--------------------------------------------------------------------------
-  #
-  #--------------------------------------------------------------------------
+    uses: ./.github/workflows/test.yml
 
   generate-artifacts:
     # This is a dependency declaration. It tells the workflow engine "don't start this job until test-job has finished."
