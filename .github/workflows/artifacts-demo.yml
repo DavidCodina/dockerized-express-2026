@@ -7,7 +7,7 @@ jobs:
   test:
     uses: ./.github/workflows/reusable-test.yml
 
-  generate-artifacts:
+  create-artifacts:
     # This is a dependency declaration. It tells the workflow engine "don't start this job until test has finished."
     needs: test
     runs-on: ubuntu-latest
