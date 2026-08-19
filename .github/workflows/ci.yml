@@ -13,6 +13,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  # ⚠️ Gotcha: Make sure the branch protection rule is now: test / reusable-test
+  # ⚠️ Gotcha: Make sure the branch protection rule on main now
+  # uses this for required status checks: "test / reusable-test"
   test:
     uses: ./.github/workflows/reusable-test.yml

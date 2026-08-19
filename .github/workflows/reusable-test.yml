@@ -4,7 +4,8 @@ on: workflow_call # Reusable Workflow
 jobs:
   reusable-test:
     runs-on: ubuntu-latest
-    # This will set the associated result to 'success'. Instead, use if: always() on other jobs.
+    # This will set the associated result to 'success'.
+    # Instead, use if: always() on other jobs.
     # ❌ continue-on-error: true
 
     steps:
