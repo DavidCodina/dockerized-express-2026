@@ -14,8 +14,23 @@ on:
   workflow_dispatch:
 
 jobs:
+  #--------------------------------------------------------------------------
+  #
+  #--------------------------------------------------------------------------
+
+  # info:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Output GitHub Context
+  #       run: echo "${{ toJSON(github) }}"
+
+  #--------------------------------------------------------------------------
+  #
+  #--------------------------------------------------------------------------
+
   random-job:
     runs-on: ubuntu-latest
+    # ❌ continue-on-error: true
 
     steps:
       - name: Checkout Code
@@ -51,24 +66,38 @@ jobs:
         run: npx eslint src --max-warnings=0
 
   #--------------------------------------------------------------------------
-
-  info:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Output GitHub Context
-        run: echo "${{ toJSON(github) }}"
-
+  #
   #--------------------------------------------------------------------------
 
   generate-artifacts:
+    # This is a dependency declaration. It tells the workflow engine "don't start this job until random-job has finished."
     needs: random-job
     runs-on: ubuntu-latest
+    #--------------------------------------------------------------------------
+    #
     # if: always() Execution: Ensures the finished job executes even if random-job fails,
     # allowing you to catch errors or log notifications regardless of outcome.
-    if: always()
+    #
+    # You may be tempted to instead do `continue-on-error:true` in random-job instead.
+    # However, that makes the job's final conclusion reported as 'success', which is not what we want.
+    #
+    #--------------------------------------------------------------------------
+    if: always() # failure() | success() | always() | cancelled()
     steps:
       - name: Write Summary File
-        #? Why to we prepend needs here?
+        #--------------------------------------------------------------------------
+        #
+        # Why to we prepend needs here? At first glance, it feels redundant.
+        # needs.random-job.result (inside an if: expression) is accessing the needs context
+        # — a special object GitHub Actions populates at runtime with the outputs and results
+        # of the jobs you declared as dependencies. So needs.random-job.result means:
+        # "look inside the needs context, find the entry for the job named random-job, and read its result field."
+        #
+        # Why you can't just write random-job.result == 'success'?
+        # There's no bare top-level variable called random-job floating around in the expression syntax.
+        # GitHub Actions expressions only expose predefined contexts — github, env, job, steps, needs, matrix, etc.
+        #
+        #--------------------------------------------------------------------------
         if: needs.random-job.result == 'success'
         run: |
           {
@@ -116,29 +145,29 @@ jobs:
           cat summary.txt
 
   #--------------------------------------------------------------------------
+  #
+  #--------------------------------------------------------------------------
 
-  result:
-    name: Result
-    needs: random-job
-    runs-on: ubuntu-latest
-    # if: always() Execution: Ensures the finished job executes even if random-job fails,
-    # allowing you to catch errors or log notifications regardless of outcome.
-    if: always()
-    steps:
-      - name: Generate Base Summary
-        run: |
-          echo "## 🚀 CI Pipeline Results" >> $GITHUB_STEP_SUMMARY
-          echo "**Triggered By:** \`${{ github.actor }}\` on \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+  # result:
+  #   name: Result
+  #   needs: random-job
+  #   runs-on: ubuntu-latest
+  #   if: always()
+  #   steps:
+  #     - name: Generate Base Summary
+  #       run: |
+  #         echo "## 🚀 CI Pipeline Results" >> $GITHUB_STEP_SUMMARY
+  #         echo "**Triggered By:** \`${{ github.actor }}\` on \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+  #         echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+  #         echo "" >> $GITHUB_STEP_SUMMARY
 
-      - name: Log Success
-        if: needs.random-job.result == 'success'
-        run: |
-          echo "### Status: ✅ All checks passed successfully!" >> $GITHUB_STEP_SUMMARY
+  #     - name: Log Success
+  #       if: needs.random-job.result == 'success'
+  #       run: |
+  #         echo "### Status: ✅ All checks passed successfully!" >> $GITHUB_STEP_SUMMARY
 
-      - name: Log Failure & Exit
-        if: needs.random-job.result != 'success'
-        run: |
-          echo "### Status: ❌ Type check or Lint checks failed." >> $GITHUB_STEP_SUMMARY
-          exit 1
+  #     - name: Log Failure & Exit
+  #       if: needs.random-job.result != 'success'
+  #       run: |
+  #         echo "### Status: ❌ Type check or Lint checks failed." >> $GITHUB_STEP_SUMMARY
+  #         exit 1
