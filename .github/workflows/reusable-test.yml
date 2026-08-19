@@ -1,8 +1,8 @@
-name: Test
+name: Reusable Test
 on: workflow_call # Reusable Workflow
 
 jobs:
-  test:
+  reusable-test:
     runs-on: ubuntu-latest
     # This will set the associated result to 'success'. Instead, use if: always() on other jobs.
     # ❌ continue-on-error: true

@@ -12,8 +12,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-job:
-    uses: ./.github/workflows/test.yml
+  test:
+    uses: ./.github/workflows/reustable-test.yml
 
   #--------------------------------------------------------------------------
   #
@@ -21,7 +21,7 @@ jobs:
 
   result:
     name: Result
-    needs: test-job
+    needs: test
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -33,12 +33,12 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
 
       - name: Log Success
-        if: needs.test-job.result == 'success'
+        if: needs.test.result == 'success'
         run: |
           echo "### Status: ✅ All checks passed successfully!" >> $GITHUB_STEP_SUMMARY
 
       - name: Log Failure & Exit
-        if: needs.test-job.result != 'success'
+        if: needs.test.result != 'success'
         run: |
           echo "### Status: ❌ Type check or Lint checks failed." >> $GITHUB_STEP_SUMMARY
           exit 1

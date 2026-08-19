@@ -4,19 +4,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-job:
-    uses: ./.github/workflows/test.yml
+  test:
+    uses: ./.github/workflows/reusable-test.yml
 
   generate-artifacts:
-    # This is a dependency declaration. It tells the workflow engine "don't start this job until test-job has finished."
-    needs: test-job
+    # This is a dependency declaration. It tells the workflow engine "don't start this job until test has finished."
+    needs: test
     runs-on: ubuntu-latest
     #--------------------------------------------------------------------------
     #
-    # if: always() Execution: Ensures the finished job executes even if test-job fails,
+    # if: always() Execution: Ensures the finished job executes even if test fails,
     # allowing you to catch errors or log notifications regardless of outcome.
     #
-    # You may be tempted to instead do `continue-on-error:true` in test-job instead.
+    # You may be tempted to instead do `continue-on-error:true` in test instead.
     # However, that makes the job's final conclusion reported as 'success', which is not what we want.
     #
     #--------------------------------------------------------------------------
@@ -26,17 +26,17 @@ jobs:
         #--------------------------------------------------------------------------
         #
         # Why do we prepend `needs here? At first glance, it feels redundant.
-        # needs.test-job.result (inside an if: expression) is accessing the needs context
+        # needs.test.result (inside an if: expression) is accessing the needs context
         # — a special object GitHub Actions populates at runtime with the outputs and results
-        # of the jobs you declared as dependencies. So needs.test-job.result means:
-        # "look inside the needs context, find the entry for the job named test-job, and read its result field."
+        # of the jobs you declared as dependencies. So needs.test.result means:
+        # "look inside the needs context, find the entry for the job named test, and read its result field."
         #
-        # Why you can't just write test-job.result == 'success'?
-        # There's no bare top-level variable called test-job floating around in the expression syntax.
+        # Why you can't just write test.result == 'success'?
+        # There's no bare top-level variable called test floating around in the expression syntax.
         # GitHub Actions expressions only expose predefined contexts — github, env, job, steps, needs, matrix, etc.
         #
         #--------------------------------------------------------------------------
-        if: needs.test-job.result == 'success'
+        if: needs.test.result == 'success'
         run: |
           {
             echo "CI Pipeline Results"
@@ -53,14 +53,14 @@ jobs:
           } >> summary.txt
 
       - name: Upload Artifacts
-        if: needs.test-job.result == 'success'
+        if: needs.test.result == 'success'
         uses: actions/upload-artifact@v7
         with:
           name: artifacts
           path: summary.txt
 
       - name: Download Artifacts
-        if: needs.test-job.result == 'success'
+        if: needs.test.result == 'success'
         uses: actions/download-artifact@v8
         with:
           name: artifacts # Should be the same as the name used when uploading.
@@ -77,7 +77,7 @@ jobs:
           #--------------------------------------------------------------------------
 
       - name: Log Summary
-        if: needs.test-job.result == 'success'
+        if: needs.test.result == 'success'
         run: |
           echo "Contents of downloaded summary.txt:"
           cat summary.txt
