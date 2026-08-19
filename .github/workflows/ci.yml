@@ -7,12 +7,12 @@ on:
   #   branches: [main]
 
   # This runs when the PR is created, NOT when a merge is made.
-  # pull_request:
-  #   branches: [main]
+  pull_request:
+    branches: [main]
 
   workflow_dispatch:
 
 jobs:
-  # Gotcha: Make sure the branch protection rule is now: test / reusable-test
+  # ⚠️ Gotcha: Make sure the branch protection rule is now: test / reusable-test
   test:
     uses: ./.github/workflows/reusable-test.yml
