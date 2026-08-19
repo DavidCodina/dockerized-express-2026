@@ -1,6 +1,7 @@
 name: Get Context
 
 on:
+  # For workflow_dispatch, it must exist on the default branch before it shows up in the GitHub Actions UI.
   workflow_dispatch:
 
 jobs:
@@ -11,12 +12,12 @@ jobs:
       LEAST_FAVORITE_LANGUAGE: YAML
 
     steps:
-      - name: Dump GitHub Context
+      - name: GitHub Context
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
 
-      - name: Dump Env Context
+      - name: Env Context
         env:
           ENV_CONTEXT: ${{ toJSON(env) }}
         run: echo "$ENV_CONTEXT"
@@ -25,22 +26,22 @@ jobs:
       # They are used for non-sensitive configuration data — things you wouldn't mind someone seeing.
       # Examples: environment name (staging/production), a default region (us-east-1), a feature flag, a build target.
       # They show up fully readable in logs if you echo them — no masking.
-      - name: Dump Vars Context
+      - name: Vars Context
         env:
           VARS_CONTEXT: ${{ toJSON(vars) }}
         run: echo "$VARS_CONTEXT"
 
-      - name: Dump Job Context
+      - name: Job Context
         env:
           JOB_CONTEXT: ${{ toJSON(job) }}
         run: echo "$JOB_CONTEXT"
 
-      - name: Dump Runner Context
+      - name: Runner Context
         env:
           RUNNER_CONTEXT: ${{ toJSON(runner) }}
         run: echo "$RUNNER_CONTEXT"
 
-      - name: Dump Steps Context
+      - name: Steps Context
         env:
           STEPS_CONTEXT: ${{ toJSON(steps) }}
         run: echo "$STEPS_CONTEXT"

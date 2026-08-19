@@ -64,3 +64,6 @@ jobs:
 
       - name: Run Tests
         run: npm run test:run
+
+## Note: This will automatically output a section in the test summary called Vitest Test Report
+## It would be nice if we could add a Linting Report to this.

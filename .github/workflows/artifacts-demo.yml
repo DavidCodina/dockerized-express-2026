@@ -1,0 +1,113 @@
+name: Artifacts Demo
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  test-job:
+    runs-on: ubuntu-latest
+    # ❌ continue-on-error: true
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Use Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Install Deps
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate --config ./prisma.config.ts
+        env:
+          DATABASE_URL: postgresql://dummy_user:dummy_password@localhost:5432/dummy_db
+
+      - name: TypeScript Check
+        run: npm run typescript
+
+      - name: Lint
+        run: npx eslint src --max-warnings=0
+
+  #--------------------------------------------------------------------------
+  #
+  #--------------------------------------------------------------------------
+
+  generate-artifacts:
+    # This is a dependency declaration. It tells the workflow engine "don't start this job until test-job has finished."
+    needs: test-job
+    runs-on: ubuntu-latest
+    #--------------------------------------------------------------------------
+    #
+    # if: always() Execution: Ensures the finished job executes even if test-job fails,
+    # allowing you to catch errors or log notifications regardless of outcome.
+    #
+    # You may be tempted to instead do `continue-on-error:true` in test-job instead.
+    # However, that makes the job's final conclusion reported as 'success', which is not what we want.
+    #
+    #--------------------------------------------------------------------------
+    if: always() # failure() | success() | always() | cancelled()
+    steps:
+      - name: Write Summary File
+        #--------------------------------------------------------------------------
+        #
+        # Why do we prepend `needs here? At first glance, it feels redundant.
+        # needs.test-job.result (inside an if: expression) is accessing the needs context
+        # — a special object GitHub Actions populates at runtime with the outputs and results
+        # of the jobs you declared as dependencies. So needs.test-job.result means:
+        # "look inside the needs context, find the entry for the job named test-job, and read its result field."
+        #
+        # Why you can't just write test-job.result == 'success'?
+        # There's no bare top-level variable called test-job floating around in the expression syntax.
+        # GitHub Actions expressions only expose predefined contexts — github, env, job, steps, needs, matrix, etc.
+        #
+        #--------------------------------------------------------------------------
+        if: needs.test-job.result == 'success'
+        run: |
+          {
+            echo "CI Pipeline Results"
+            echo "===================="
+            echo "Status:      SUCCESS"
+            echo "Repository:  ${{ github.repository }}"
+            echo "Branch:      ${{ github.ref_name }}"
+            echo "Triggered by: ${{ github.actor }}"
+            echo "Event:       ${{ github.event_name }}"
+            echo "Commit SHA:  ${{ github.sha }}"
+            echo "Run ID:      ${{ github.run_id }}"
+            echo "Run number:  ${{ github.run_number }}"
+            echo "Timestamp:   $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          } >> summary.txt
+
+      - name: Upload Artifacts
+        if: needs.test-job.result == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          name: artifacts
+          path: summary.txt
+
+      - name: Download Artifacts
+        if: needs.test-job.result == 'success'
+        uses: actions/download-artifact@v8
+        with:
+          name: artifacts # Should be the same as the name used when uploading.
+          #--------------------------------------------------------------------------
+          #
+          # One can set a path,
+          #
+          #   path: downloaded-artifacts
+          #
+          # Make sure to change the cat command below to:
+          #
+          #  cat downloaded-artifacts/summary.txt
+          #
+          #--------------------------------------------------------------------------
+
+      - name: Log Summary
+        if: needs.test-job.result == 'success'
+        run: |
+          echo "Contents of downloaded summary.txt:"
+          cat summary.txt
