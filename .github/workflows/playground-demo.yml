@@ -1,0 +1,44 @@
+## Currently, this is running everything against node-version 24, but what
+## if we want to actually run all the tests against a Docker image?
+## Review: Corresponds to lesson 8 in the FEM course.
+## https://github.com/ALT-F4-LLC/fem-cicd-service/blob/poc/.github/workflows/deploy.yml
+
+name: Playground Demo
+
+on:
+  push:
+    branches: [development, feature/**] # i.e., feature/foo/bar
+    # branches-ignore: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    uses: ./.github/workflows/reustable-test.yml
+
+  #--------------------------------------------------------------------------
+  #
+  #--------------------------------------------------------------------------
+
+  result:
+    name: Result
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Generate Base Summary
+        run: |
+          echo "## 🚀 CI Pipeline Results" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered By:** \`${{ github.actor }}\` on \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: Log Success
+        if: needs.test.result == 'success'
+        run: |
+          echo "### Status: ✅ All checks passed successfully!" >> $GITHUB_STEP_SUMMARY
+
+      - name: Log Failure & Exit
+        if: needs.test.result != 'success'
+        run: |
+          echo "### Status: ❌ Type check or Lint checks failed." >> $GITHUB_STEP_SUMMARY
+          exit 1

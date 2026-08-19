@@ -1,0 +1,83 @@
+name: Artifacts Demo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    uses: ./.github/workflows/reusable-test.yml
+
+  create-artifacts:
+    # This is a dependency declaration. It tells the workflow engine "don't start this job until test has finished."
+    needs: test
+    runs-on: ubuntu-latest
+    #--------------------------------------------------------------------------
+    #
+    # if: always() Execution: Ensures the finished job executes even if test fails,
+    # allowing you to catch errors or log notifications regardless of outcome.
+    #
+    # You may be tempted to instead do `continue-on-error:true` in test instead.
+    # However, that makes the job's final conclusion reported as 'success', which is not what we want.
+    #
+    #--------------------------------------------------------------------------
+    if: always() # failure() | success() | always() | cancelled()
+    steps:
+      - name: Write Summary File
+        #--------------------------------------------------------------------------
+        #
+        # Why do we prepend `needs here? At first glance, it feels redundant.
+        # needs.test.result (inside an if: expression) is accessing the needs context
+        # — a special object GitHub Actions populates at runtime with the outputs and results
+        # of the jobs you declared as dependencies. So needs.test.result means:
+        # "look inside the needs context, find the entry for the job named test, and read its result field."
+        #
+        # Why you can't just write test.result == 'success'?
+        # There's no bare top-level variable called test floating around in the expression syntax.
+        # GitHub Actions expressions only expose predefined contexts — github, env, job, steps, needs, matrix, etc.
+        #
+        #--------------------------------------------------------------------------
+        if: needs.test.result == 'success'
+        run: |
+          {
+            echo "CI Pipeline Results"
+            echo "===================="
+            echo "Status:      SUCCESS"
+            echo "Repository:  ${{ github.repository }}"
+            echo "Branch:      ${{ github.ref_name }}"
+            echo "Triggered by: ${{ github.actor }}"
+            echo "Event:       ${{ github.event_name }}"
+            echo "Commit SHA:  ${{ github.sha }}"
+            echo "Run ID:      ${{ github.run_id }}"
+            echo "Run number:  ${{ github.run_number }}"
+            echo "Timestamp:   $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          } >> summary.txt
+
+      - name: Upload Artifacts
+        if: needs.test.result == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          name: artifacts
+          path: summary.txt
+
+      - name: Download Artifacts
+        if: needs.test.result == 'success'
+        uses: actions/download-artifact@v8
+        with:
+          name: artifacts # Should be the same as the name used when uploading.
+          #--------------------------------------------------------------------------
+          #
+          # One can set a path,
+          #
+          #   path: downloaded-artifacts
+          #
+          # Make sure to change the cat command below to:
+          #
+          #  cat downloaded-artifacts/summary.txt
+          #
+          #--------------------------------------------------------------------------
+
+      - name: Log Summary
+        if: needs.test.result == 'success'
+        run: |
+          echo "Contents of downloaded summary.txt:"
+          cat summary.txt
