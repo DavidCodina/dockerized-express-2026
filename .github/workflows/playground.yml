@@ -50,33 +50,25 @@ jobs:
         # ❌ run: npm run lint
         run: npx eslint src --max-warnings=0
 
+  #--------------------------------------------------------------------------
+
   info:
     runs-on: ubuntu-latest
     steps:
       - name: Output GitHub Context
         run: echo "${{ toJSON(github) }}"
 
-  result:
-    name: Result
+  #--------------------------------------------------------------------------
+
+  generate-artifacts:
     needs: random-job
     runs-on: ubuntu-latest
     # if: always() Execution: Ensures the finished job executes even if random-job fails,
     # allowing you to catch errors or log notifications regardless of outcome.
     if: always()
     steps:
-      - name: Generate Base Summary
-        run: |
-          echo "## 🚀 CI Pipeline Results" >> $GITHUB_STEP_SUMMARY
-          echo "**Triggered By:** \`${{ github.actor }}\` on \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-      - name: Log Success
-        if: needs.random-job.result == 'success'
-        run: |
-          echo "### Status: ✅ All checks passed successfully!" >> $GITHUB_STEP_SUMMARY
-
       - name: Write Summary File
+        #? Why to we prepend needs here?
         if: needs.random-job.result == 'success'
         run: |
           {
@@ -122,6 +114,28 @@ jobs:
         run: |
           echo "Contents of downloaded summary.txt:"
           cat summary.txt
+
+  #--------------------------------------------------------------------------
+
+  result:
+    name: Result
+    needs: random-job
+    runs-on: ubuntu-latest
+    # if: always() Execution: Ensures the finished job executes even if random-job fails,
+    # allowing you to catch errors or log notifications regardless of outcome.
+    if: always()
+    steps:
+      - name: Generate Base Summary
+        run: |
+          echo "## 🚀 CI Pipeline Results" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered By:** \`${{ github.actor }}\` on \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: Log Success
+        if: needs.random-job.result == 'success'
+        run: |
+          echo "### Status: ✅ All checks passed successfully!" >> $GITHUB_STEP_SUMMARY
 
       - name: Log Failure & Exit
         if: needs.random-job.result != 'success'
