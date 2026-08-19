@@ -9,6 +9,7 @@ on:
   # This runs when the PR is created, NOT when a merge is made.
   pull_request:
     branches: [main]
+    # types: [opened, synchronize, reopened]
 
 jobs:
   test:
@@ -16,12 +17,26 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Use Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24
+          #--------------------------------------------------------------------------
+          #
+          # Tells actions/setup-node to automatically cache your npm dependency cache between workflow runs.
+          #
+          #   1. Looks for a lockfile (package-lock.json by default) and hashes it.
+          #   2. Uses that hash as part of the cache key.
+          #   3. Restores ~/.npm (npm's global cache directory — not node_modules) from a previous run if the hash matches.
+          #   4. After the job finishes, saves an updated cache if the lockfile changed.
+          #
+          # So when npm ci runs later in your workflow, npm can pull packages from the restored local cache instead of hitting
+          # the registry over the network, which is significantly faster — but npm ci still does a full, deterministic install
+          # into node_modules every time (it doesn't skip the install step, it just skips most of the downloading).
+          #
+          #--------------------------------------------------------------------------
           cache: 'npm'
 
       - name: Install Deps
@@ -38,14 +53,14 @@ jobs:
           # If your tests mock the DB layer or don't touch it, the dummy value above is sufficient.
           DATABASE_URL: postgresql://dummy_user:dummy_password@localhost:5432/dummy_db
 
-      # - name: Type Check
-      #   run: npm run typescript
+      - name: TypeScript Check
+        run: npm run typescript
 
-      # - name: Lint
-      #   # The current package.json `npm run lint` script will not cause the CI step to fail on warnings.
-      #   # However, in the actual CI we want it to, so we use --max-warnings=0
-      #   # ❌ run: npm run lint
-      #   run: npx eslint src --max-warnings=0
+      - name: Lint
+        # The current package.json `npm run lint` script will not cause the CI step to fail on warnings.
+        # However, in the actual CI we want it to, so we use --max-warnings=0
+        # ❌ run: npm run lint
+        run: npx eslint src --max-warnings=0
 
       - name: Run Tests
         run: npm run test:run

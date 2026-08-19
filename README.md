@@ -14,6 +14,7 @@ The `docker:prod:up`, `docker-compose.prod.yaml` and `.env.production` are not i
 ## GitHub Repository + Render Auto Deploy
 
 See Render documentation on [Building From A Dockerfile](https://render.com/docs/docker#building-from-a-dockerfile).
+**Note:** Just for fun, there's also a `.github/workflows/deploy.yaml` for manually deploying _any_ branch directly to production.
 
 ## Alternative: GitHub Container Registry + Render
 
