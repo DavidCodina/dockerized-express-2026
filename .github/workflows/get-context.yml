@@ -15,6 +15,38 @@ jobs:
       LEAST_FAVORITE_LANGUAGE: YAML
 
     steps:
+      - name: Display Working Directory & List Files
+        run: |
+          pwd
+          ls -la
+
+        # https://docs.github.com/en/actions/reference/workflows-and-actions/variables#default-environment-variables
+      - name: Echo Default Environment Variables
+        run: |
+          echo "== Repository Information =="
+          echo $GITHUB_REPOSITORY          # owner/repo
+          echo $GITHUB_REPOSITORY_OWNER    # just the owner
+          echo $GITHUB_SHA                 # commit SHA that triggered the run
+          echo $GITHUB_REF                 # branch/tag ref, e.g. refs/heads/main
+          echo $GITHUB_REF_NAME            # just "main" instead of refs/heads/main
+          echo $GITHUB_HEAD_REF            # source branch (PRs only)
+          echo $GITHUB_BASE_REF            # target branch (PRs only)
+
+          echo "== Run info =="
+          echo $GITHUB_WORKFLOW            # name of the workflow
+          echo $GITHUB_RUN_ID              # unique ID for this run
+          echo $GITHUB_RUN_NUMBER          # incrementing run number
+          echo $GITHUB_JOB                 # job ID
+          echo $GITHUB_ACTION              # current action's id
+          echo $GITHUB_EVENT_NAME          # e.g. push, pull_request
+
+          echo "== Paths =="
+          echo $GITHUB_WORKSPACE           # path to your checked-out repo
+          echo $GITHUB_EVENT_PATH          # path to a JSON file with the full event payload
+          echo $RUNNER_OS                  # Linux, Windows, or macOS
+          echo $RUNNER_TEMP                # temp dir on the runner
+          echo $RUNNER_TOOL_CACHE          # cached tool versions dir
+
       - name: GitHub Context
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
