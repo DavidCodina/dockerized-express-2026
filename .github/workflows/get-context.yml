@@ -18,6 +18,11 @@ jobs:
       - name: Display Working Directory
         run: |
           pwd
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: List Files After Checkout
+        run: ls -a
 
         # https://docs.github.com/en/actions/reference/workflows-and-actions/variables#default-environment-variables
       - name: Echo Default Environment Variables

@@ -1,7 +1,7 @@
 name: Outputs Demo
 
 on:
-  push:
+  # push:
   workflow_dispatch:
 
 jobs:
@@ -13,6 +13,10 @@ jobs:
       - name: Set Output
         id: set-output
         #--------------------------------------------------------------------------
+        #
+        # Understanding The Syntax:
+        #
+        #   run: echo "key=value" >> "$GITHUB_OUTPUT"
         #
         # >> is a shell redirection operator. Normally, echo "greeting=Whuddup bro!" would print
         # that text to standard output (the log). The >> redirects that text into a file instead
