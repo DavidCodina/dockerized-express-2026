@@ -1,0 +1,54 @@
+# https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands
+# https://docs.github.com/en/actions/how-tos/monitor-workflows/enable-debug-logging
+
+name: Workflow Commands
+on:
+  workflow_dispatch:
+
+jobs:
+  workflow-commands:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setting Error Message
+        run: echo "::error::You did a bad thing!"
+
+      - name: Set Error Message With Params
+        run: echo "::error title=Error Title Here,file=app.js,line=2,endLine=3,col=5,endColumn=7::This is the error message"
+
+      # One behavior to know about: the debug message step will run without error, but it won't show up in the logs by default.
+      # Debug messages only print if you've set the ACTIONS_STEP_DEBUG secret (or the ACTIONS_RUNNER_DEBUG for runner diagnostics)
+      # to true in the repo/org settings. If you want to confirm it's working, add that secret first — otherwise that step will
+      # look like it did nothing even though it succeeded.
+
+      # debug only takes the message — it doesn't support title/file/line/etc. at all, since it's
+      # meant for  plain diagnostic text rather than file-anchored annotations.
+      - name: Set Debug Message
+        run: echo "::debug::This is the debug message"
+
+      - name: Set Warning Message With Params
+        run: echo "::warning title=Warning Title Here,file=app.js,line=2,endLine=3,col=5,endColumn=7::This is the warning message"
+
+      - name: Set Notice Message With Params
+        run: echo "::notice title=Notice Title Here,file=app.js,line=2,endLine=3,col=5,endColumn=7::This is the notice message"
+
+      - name: Group Log Lines
+        run: |
+          echo "::group::Build details"
+          echo "This line is nested inside the group"
+          echo "::endgroup::"
+
+      - name: Mask a Value in the Log
+        run: echo "::add-mask::supersecretvalue123"
+
+      - name: Set an Environment Variable
+        run: echo "MY_VAR=hello world" >> "$GITHUB_ENV"
+
+      - name: Set a Step Output
+        id: my_output_step
+        run: echo "greeting=hi there" >> "$GITHUB_OUTPUT"
+
+      - name: Add a Job Summary
+        run: echo "### Build succeeded :rocket:" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Add to System PATH
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
