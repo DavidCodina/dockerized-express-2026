@@ -15,12 +15,9 @@ jobs:
       LEAST_FAVORITE_LANGUAGE: YAML
 
     steps:
-      - name: Display Working Directory & List Files
-        # ls -la lists everything in that directory, including hidden files
-        # (that's what -a adds) in long format (-l, showing permissions, owner, size, date).
+      - name: Display Working Directory
         run: |
           pwd
-          ls -la
 
         # https://docs.github.com/en/actions/reference/workflows-and-actions/variables#default-environment-variables
       - name: Echo Default Environment Variables
@@ -31,6 +28,17 @@ jobs:
           echo "GITHUB_SHA: $GITHUB_SHA"
           echo "GITHUB_REF: $GITHUB_REF"
           echo "GITHUB_REF_NAME: $GITHUB_REF_NAME"
+          echo "GITHUB_ACTOR: $GITHUB_ACTOR"
+
+          # GITHUB_HEAD_REF and GITHUB_BASE_REF are only populated when the workflow is 
+          # triggered  by a pull_request or pull_request_target event. They represent:
+          #
+          #   GITHUB_HEAD_REF : the source/feature branch of the PR (e.g., feature-branch-1)
+          #   GITHUB_BASE_REF : the target branch the PR is merging into (e.g., main)
+          #
+          # If your workflow ran because of a push, workflow_dispatch, schedule, or basically any trigger 
+          # other than a pull request, these two variables simply don't apply
+
           echo "GITHUB_HEAD_REF: $GITHUB_HEAD_REF"
           echo "GITHUB_BASE_REF: $GITHUB_BASE_REF"
 
@@ -41,6 +49,7 @@ jobs:
           echo "GITHUB_JOB: $GITHUB_JOB"
           echo "GITHUB_ACTION: $GITHUB_ACTION"
           echo "GITHUB_ACTION: $GITHUB_ACTION"
+
 
           echo "== Paths =="
           echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
