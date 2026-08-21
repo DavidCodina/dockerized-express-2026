@@ -32,6 +32,7 @@ jobs:
         run: ls -a
 
         # https://docs.github.com/en/actions/reference/workflows-and-actions/variables#default-environment-variables
+        # The default GITHUB variables are generally only available within the runner environment (i.e., after runs-on: ubuntu-latest).
       - name: Echo Default Environment Variables
         run: |
           echo "== Repository Information =="
