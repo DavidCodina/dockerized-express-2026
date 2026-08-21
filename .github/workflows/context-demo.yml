@@ -1,0 +1,106 @@
+# https://docs.github.com/en/actions/concepts/workflows-and-actions/contexts
+# https://docs.github.com/en/actions/reference/workflows-and-actions/contexts
+
+name: Context Demo
+
+on:
+  # For workflow_dispatch, it must exist on the default branch before it shows up in the GitHub Actions UI.
+  workflow_dispatch:
+    inputs:
+      run_name:
+        description: 'Optional custom name for this run'
+        required: false
+        type: string
+
+run-name: "${{ inputs.run_name || format('{0} #{1} by {2}', github.workflow, github.run_number, github.actor) }}"
+
+jobs:
+  context:
+    runs-on: ubuntu-latest
+    env:
+      FAVORITE_LANGUAGE: Python
+      LEAST_FAVORITE_LANGUAGE: YAML
+
+    steps:
+      - name: Display Working Directory
+        run: |
+          pwd
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: List Files After Checkout
+        run: ls -a
+
+        # https://docs.github.com/en/actions/reference/workflows-and-actions/variables#default-environment-variables
+        # The default GITHUB variables are generally only available within the runner environment (i.e., after runs-on: ubuntu-latest).
+      - name: Echo Default Environment Variables
+        run: |
+          echo "== Repository Information =="
+          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
+          echo "GITHUB_REPOSITORY_OWNER: $GITHUB_REPOSITORY_OWNER"
+          echo "GITHUB_SHA: $GITHUB_SHA"
+          echo "GITHUB_REF: $GITHUB_REF"
+          echo "GITHUB_REF_NAME: $GITHUB_REF_NAME"
+          echo "GITHUB_ACTOR: $GITHUB_ACTOR"
+
+          # GITHUB_HEAD_REF and GITHUB_BASE_REF are only populated when the workflow is 
+          # triggered  by a pull_request or pull_request_target event. They represent:
+          #
+          #   GITHUB_HEAD_REF : the source/feature branch of the PR (e.g., feature-branch-1)
+          #   GITHUB_BASE_REF : the target branch the PR is merging into (e.g., main)
+          #
+          # If your workflow ran because of a push, workflow_dispatch, schedule, or basically any trigger 
+          # other than a pull request, these two variables simply don't apply
+
+          echo "GITHUB_HEAD_REF: $GITHUB_HEAD_REF"
+          echo "GITHUB_BASE_REF: $GITHUB_BASE_REF"
+
+          echo "== Run Information =="
+          echo "GITHUB_WORKFLOW: $GITHUB_WORKFLOW"
+          echo "GITHUB_RUN_ID: $GITHUB_RUN_ID"
+          echo "GITHUB_RUN_NUMBER: $GITHUB_RUN_NUMBER"
+          echo "GITHUB_JOB: $GITHUB_JOB"
+          echo "GITHUB_ACTION: $GITHUB_ACTION"
+          echo "GITHUB_ACTION: $GITHUB_ACTION"
+
+
+          echo "== Paths =="
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "GITHUB_EVENT_PATH: $GITHUB_EVENT_PATH"
+          echo "RUNNER_OS: $RUNNER_OS"
+          echo "RUNNER_TEMP: $RUNNER_TEMP"
+          echo "RUNNER_TOOL_CACHE: $RUNNER_TOOL_CACHE"
+
+      - name: GitHub Context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - name: Env Context
+        env:
+          ENV_CONTEXT: ${{ toJSON(env) }}
+        run: echo "$ENV_CONTEXT"
+
+      # vars are created in the repo itself at Settings → Secrets and variables → Actions → Variables tab
+      # They are used for non-sensitive configuration data — things you wouldn't mind someone seeing.
+      # Examples: environment name (staging/production), a default region (us-east-1), a feature flag, a build target.
+      # They show up fully readable in logs if you echo them — no masking.
+      - name: Vars Context
+        env:
+          VARS_CONTEXT: ${{ toJSON(vars) }}
+        run: echo "$VARS_CONTEXT"
+
+      - name: Job Context
+        env:
+          JOB_CONTEXT: ${{ toJSON(job) }}
+        run: echo "$JOB_CONTEXT"
+
+      - name: Runner Context
+        env:
+          RUNNER_CONTEXT: ${{ toJSON(runner) }}
+        run: echo "$RUNNER_CONTEXT"
+
+      - name: Steps Context
+        env:
+          STEPS_CONTEXT: ${{ toJSON(steps) }}
+        run: echo "$STEPS_CONTEXT"

@@ -7,13 +7,18 @@ name: Playground Demo
 
 on:
   push:
-    branches: [development, feature/**] # i.e., feature/foo/bar
+    branches: [development, feature/**] # i.e., feature/foo, feature/foo/bar
+    # Note: You can't use branches and branches-ignore at the same time.
+    # However, I think we can use branches: [!main]
     # branches-ignore: [main]
+
+    # tags:
+    # paths:
   workflow_dispatch:
 
 jobs:
   test:
-    uses: ./.github/workflows/reustable-test.yml
+    uses: ./.github/workflows/reusable-test.yml
 
   #--------------------------------------------------------------------------
   #

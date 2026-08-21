@@ -1,0 +1,68 @@
+name: Outputs Demo
+
+on:
+  # push:
+  workflow_dispatch:
+
+jobs:
+  create-output:
+    runs-on: ubuntu-latest
+    outputs:
+      greeting: ${{ steps.set-output.outputs.greeting }}
+    steps:
+      - name: Set Output
+        id: set-output
+        #--------------------------------------------------------------------------
+        #
+        # Understanding The Syntax:
+        #
+        #   run: echo "key=value" >> "$GITHUB_OUTPUT"
+        #
+        # >> is a shell redirection operator. Normally, echo "greeting=Whuddup bro!" would print
+        # that text to standard output (the log). The >> redirects that text into a file instead
+        # — specifically, it appends it to the end of the file.
+        #
+        #   > would overwrite the file's contents with just this line.
+        #   >> appends this line to whatever's already in the file, without deleting existing content.
+        #
+        # We use >> (append) because $GITHUB_OUTPUT might already have other outputs written to it earlier
+        # in the same step or job, and we don't want to wipe those out.
+        #
+        # $GITHUB_OUTPUT is an environment variable that GitHub Actions automatically sets for every step.
+        # It points to a temporary file on the runner (something like /home/runner/work/_temp/xxxxx) that
+        # GitHub creates specifically for collecting that step's outputs. $GITHUB_OUTPUT is the mechanism
+        # GitHub uses to capture step outputs. Without writing to $GITHUB_OUTPUT, there's no way for a step
+        # to expose a value to be read later
+        #
+        # Here's the flow:
+        #
+        #   1. GitHub creates an empty temp file before your step runs and stores its path in the $GITHUB_OUTPUT variable.
+        #
+        #   2. The run command writes key=value lines into that file (that's what our echo ... >> "$GITHUB_OUTPUT" does).
+        #
+        #   3. After the step finishes, GitHub Actions reads that file and turns each key=value line into an actual output
+        #      for the step. Access patterns:
+        #
+        #      - steps.<step-id>.outputs.<key> :  used to access an output from a previous step in the same job.
+        #        This only works within that job because once the job finishes, its runner (and all the step-level context) is torn down.
+        #
+        #      - needs.<job-id>.outputs.<key> : used to access an output from a different job, but only a job listed in needs:.
+        #        This works because when a job declares outputs: (like create-output does with greeting), GitHub Actions promotes
+        #        that value up to the job level and keeps it around so dependent jobs can read it, even though the original runner is gone.
+        #
+        # The following line is essentially telling GitHub to take the text "greeting=Whuddup bro!", and append it as a new line to the
+        # special file GitHub is watching for this step's outputs. GitHub then parses that line as key = greeting, value = Whuddup bro!,
+        # and makes it available as steps.set-output.outputs.greeting.
+        #
+        #--------------------------------------------------------------------------
+        run: echo "greeting=Whuddup bro!" >> "$GITHUB_OUTPUT"
+
+      - name: Print Output From Previous Step
+        run: echo "${{ steps.set-output.outputs.greeting }}"
+
+  use-output:
+    runs-on: ubuntu-latest
+    needs: create-output
+    steps:
+      - name: Print Output From Previous Job
+        run: echo "${{ needs.create-output.outputs.greeting }}"

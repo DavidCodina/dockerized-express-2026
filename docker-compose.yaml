@@ -1,7 +1,5 @@
 # Todo: Have Claude review this.
 
-## ❎ Improve on current ci.yml with TypeScript and linting.
-
 ## Update package.json dependencies. Ensure they are all statically set (i.e., no ^ or ~).
 
 ## Update TypeScript
@@ -22,8 +20,6 @@
 
 ## Also, how does it work in Render if we want a staging deployment?
 
-# Todo: Switch to a CI/CD with GitHub Actions and/or Workflows.
-## Add a development branch.
 ## Review render for staging solutions.
 
 # Todo: Should we add back rimraf as part of the prebuild?

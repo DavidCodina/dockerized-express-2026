@@ -13,6 +13,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  # ⚠️ Gotcha: Make sure the branch protection rule is now: test / reusable-test
+  # ⚠️ Gotcha: Make sure the branch protection rule on main now
+  # uses this for required status checks: "test / reusable-test"
+  # This has nothing to do with the file name. It's about the job names:
+  # outer job / nested job
   test:
     uses: ./.github/workflows/reusable-test.yml
