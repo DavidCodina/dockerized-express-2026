@@ -1,11 +1,18 @@
 # https://docs.github.com/en/actions/concepts/workflows-and-actions/contexts
 # https://docs.github.com/en/actions/reference/workflows-and-actions/contexts
 
-name: Get Context
+name: Context Demo
 
 on:
   # For workflow_dispatch, it must exist on the default branch before it shows up in the GitHub Actions UI.
   workflow_dispatch:
+    inputs:
+      run_name:
+        description: 'Optional custom name for this run'
+        required: false
+        type: string
+
+run-name: "${{ inputs.run_name || format('{0} #{1} by {2}', github.workflow, github.run_number, github.actor) }}"
 
 jobs:
   context:
