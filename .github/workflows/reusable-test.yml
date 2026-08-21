@@ -1,5 +1,5 @@
 name: Reusable Test
-on: workflow_call # Reusable Workflow
+on: workflow_call # Reusable workflow
 
 jobs:
   reusable-test:
