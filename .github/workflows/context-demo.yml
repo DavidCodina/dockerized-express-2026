@@ -6,13 +6,14 @@ name: Context Demo
 on:
   # For workflow_dispatch, it must exist on the default branch before it shows up in the GitHub Actions UI.
   workflow_dispatch:
-    # inputs:
-    #   run_name:
-    #     description: 'Optional custom name for this run'
-    #     required: false
-    #     type: string
+    inputs:
+      run_name:
+        description: 'Optional run name:'
+        required: false
+        type: string
 
-# run-name: "${{ inputs.run_name || format('{0} #{1} by {2}', github.workflow, github.run_number, github.actor) }}"
+# For example: Test Workflow | Context Demo #2 by DavidCodina
+run-name: "${{ inputs.run_name || format('{0} #{1} by {2}', github.workflow, github.run_number, github.actor) }}"
 
 jobs:
   context:
@@ -32,7 +33,7 @@ jobs:
         run: ls -a
 
         # https://docs.github.com/en/actions/reference/workflows-and-actions/variables#default-environment-variables
-        # The default GITHUB variables are generally only available within the runner environment (i.e., after runs-on: ubuntu-latest).
+        # The default GITHUB variables are generally only available within the runner environment (i.e., after runs-on: ubuntu-latest)
       - name: Echo Default Environment Variables
         run: |
           echo "== Repository Information =="
